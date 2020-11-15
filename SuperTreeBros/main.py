@@ -30,13 +30,13 @@ class Player:
         self.controls = controls
         self.moving = False
         self.isJump = False
-        self.jumpCount = 10
+        self.falling = True
+        self.jumpCount = 0
         self.x = x
         self.y = y
         self.movex = 0
         self.movey = 0
         self.frame = 0
-        self.jumpH = 12
         self.images = []
         img = pygame.image.load(os.path.join('images', 'jan_stand.png'))
         self.images.append(img)
@@ -53,13 +53,16 @@ class Player:
         """
         self.movex += x
 
+    def fall(self, grv):
+        self.movey += grv
+    
     def update(self):
         """
         Update sprite position
         """
 
         self.x = self.x + self.movex
-        #self.y = self.y + self.movey
+        self.y = self.y + self.movey
         
         if self.moving:
             # moving left
@@ -79,19 +82,13 @@ class Player:
             self.image = self.images[0]
 
 
-    def jump(self):
-        self.isJump = True
-            if not (player.isJump):
-                if player.jumpCount >= -10:
-                    neg = 1
-                    if player.jumpCount < 0:
-                        neg = -1
-                    player.y -= (player.jumpCount ** 2) * 0.5 * neg
-                    player.jumpCount -= 1
-            else:
-                player.isJump = False
-                player.jumpCount = 10
-
+    def jump(self, grv):
+        
+        if not self.falling:
+            self.isJump = True
+            self.jumpCount = 10
+            
+            
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
         
@@ -119,20 +116,24 @@ def main():
     pygame.init()
     #backdropbox = world.get_rect()
     main = True
-
+    
+    gravity = 2
     steps_x = 10
-    steps_y = 5
     player_list = []
     
-    player1 = Player(['w', 'a', 'd'], 0, 500)  # spawn player
+    player1 = Player(['w', 'a', 'd'], 100, 100)  # spawn player
     player_list.append(player1)
     
 
-    player2 = Player([pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT], 500, 500)  # spawn player
+    player2 = Player([pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT], 750, 100)  # spawn player
     player_list.append(player2)
     
-    plat = Platform(world, 450, 500, 100, 100)
+    plat1 = Platform(world, 250, 450, 400, 30)
+    plat2 = Platform(world, 50, 300, 150, 30)
+    plat3 = Platform(world, 700, 300, 150, 30)
 
+    plat_list = [plat1, plat2, plat3]
+    print(plat_list)
     
     '''
     Main Loop
@@ -150,25 +151,28 @@ def main():
                     
             for player in player_list:
                 if isinstance(player.controls[0], str):
+
                     if event.type == pygame.KEYDOWN:
 
                         player.moving = True
                         if event.key == ord(player.controls[1]):
                             player.control(-steps_x)
-                        if event.key == ord(player.controls[2]):
+                        elif event.key == ord(player.controls[2]):
                             player.control(steps_x)
-                        if event.key == ord(player.controls[0]):
-                            player.jump()
+                        elif event.key == ord(player.controls[0]):
+                            player.jump(gravity)
 
-                    if event.type == pygame.KEYUP:
-
+                    elif event.type == pygame.KEYUP:
                         player.moving = False
                         if event.key == ord(player.controls[1]):
                             player.control(steps_x)
-                        if event.key == ord(player.controls[2]):
+                        elif event.key == ord(player.controls[2]):
                             player.control(-steps_x)
-                        if event.key == ord(player.controls[0]):
-                            player.jump()
+                        elif event.key == ord(player.controls[0]):
+                            #player.jump()
+                            print("wtf")
+                        
+                            
                 else:
                     if event.type == pygame.KEYDOWN:
                         
@@ -178,26 +182,51 @@ def main():
                         if event.key == player.controls[2]:
                             player.control(steps_x)
                         if event.key == player.controls[0]:
-                            print("wtf")
+                            player.jump(gravity)
                             
 
-                    if event.type == pygame.KEYUP:
-                        
+                    elif event.type == pygame.KEYUP:
                         player.moving = False
                         if event.key == player.controls[1]:
                             player.control(steps_x)
-                        if event.key == player.controls[2]:
+                        elif event.key == player.controls[2]:
                             player.control(-steps_x)
-                        if event.key == player.controls[0]:
+                        elif event.key == player.controls[0]:
                             print("wtf")
-                        
 
+                        
         world.fill((0,0,0))
         world.blit(backdrop, (0,0))
-        
-        plat.draw()
+
+        for plat in plat_list:
+            plat.draw()
 
         for player in player_list:
+
+            if player.isJump:
+                player.falling = True
+                if player.jumpCount > 0:
+                    player.fall(-gravity)
+                    player.jumpCount -= 1
+                else:
+                    player.isJump = False
+                    
+            
+            elif player.falling:
+                player.fall(gravity)
+                for plat in plat_list:
+                    if (player.x-10 >= plat.xi and player.x+45 <= plat.xi + plat.distx) and (player.y >= plat.yi - 80 and player.y <= plat.yi-45):
+                        player.movey = 0
+                        player.falling = False
+                        
+            else:
+                checks = 0
+                for plat in plat_list:
+                    if player.x < plat.xi or player.x+55 > plat.xi + plat.distx:
+                        checks += 1
+                if checks == 3:
+                    player.falling = True
+                        
             player.update()
             player.draw(world)
 
