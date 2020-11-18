@@ -19,7 +19,7 @@ Objects
 '''
 
 
-class Player:
+class Player(object):
     """
     Spawn a player
     """
@@ -32,12 +32,15 @@ class Player:
         self.falling = True
         self.jumpCount = 0
         self.colide = False
+        self.powerUp = ""
         self.x = x
         self.y = y
         self.movex = 0
         self.movey = 0
         self.frame = 0
         self.extraJumps = 0
+        self.shield = False
+        self.power = 10
         self.images = []
         img = pygame.image.load(os.path.join('images', 'jan_stand.png'))
         self.images.append(img)
@@ -46,7 +49,10 @@ class Player:
         for i in range(1,4):
             img = pygame.image.load(os.path.join('images', 'jan_run' + str(i) + '.png'))
             self.images.append(img)
-
+        img = pygame.image.load(os.path.join('images', 'jan_jump.png'))
+        self.images.append(img)
+        img = pygame.image.load(os.path.join('images', 'jan_land.png'))
+        self.images.append(img)
 
     def control(self, x):
         """
@@ -71,33 +77,61 @@ class Player:
                 self.frame += 1
                 if self.frame > 3:
                     self.frame = 1
-                self.image = pygame.transform.flip(self.images[self.frame], True, False)
-
+                if not self.isJump:
+                    self.image = pygame.transform.flip(self.images[self.frame], True, False)
+                else:
+                    self.image = pygame.transform.flip(self.images[4], True, False)
             # moving right
             if self.movex > 0:
                 self.frame += 1
                 if self.frame > 3:
                     self.frame = 1
-                self.image = self.images[self.frame]
+                if not self.isJump:
+                    self.image = self.images[self.frame]
+                else:
+                    self.image = self.images[4]
         else:
-            self.image = self.images[0]
+            if self.movex > 0:
+                self.image = pygame.transform.flip(self.images[0], True, False)
+            else:
+                self.image = self.images[0]
 
 
     def jump(self, grv):
         
-        if (not self.falling): #or (self.extraJumps > 0):
+        if not self.falling : #or (self.extraJumps > 0):
+            self.image = self.images[4]
             self.isJump = True
             self.jumpCount = 14
-            #if self.extraJumps > 0:
-                #self.extraJumps -= 1
+        elif self.extraJumps > 0:
+            self.image = self.images[4]
+            self.isJump = True
+            self.jumpCount = 35
+            self.extraJumps = 0
 
-            
+    def performPower(self):
+        if self.powerUp != "":
+            if self.powerUp == "forcepush":
+                self.power = 50
+            elif self.powerUp == "extrajump":
+                self.extraJumps = 1
+            elif self.powerUp == "shield":
+                self.shield = True
+       
     def pushed(self, pushed):
         self.x += pushed
-    
+
+    def down(self):
+        self.image = self.images[5]
+
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
-        
+
+
+
+class Powerups:
+    def __init__(self):
+        print("")
 
 class Platform:
     def __init__(self, screen, xi, yi, distx, disty):
@@ -127,11 +161,10 @@ def main():
     steps_x = 10
     player_list = []
     
-    player1 = Player(['w', 'a', 'd'], 100, 100)  # spawn player
+    player1 = Player(['w', 'a', 'd', 's','g'], 100, 100)  # spawn player
     player_list.append(player1)
-    
 
-    player2 = Player([pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT], 750, 100)  # spawn player
+    player2 = Player([pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_RSHIFT], 750, 100)  # spawn player
     player_list.append(player2)
     
     plat1 = Platform(world, 250, 450, 400, 30)
@@ -140,7 +173,7 @@ def main():
 
     plat_list = [plat1, plat2, plat3]
     print(plat_list)
-    
+
     '''
     Main Loop
     '''
@@ -165,8 +198,14 @@ def main():
                             player.control(-steps_x)
                         elif event.key == ord(player.controls[2]):
                             player.control(steps_x)
+                        elif event.key == ord(player.controls[3]):
+                            player.down()
                         elif event.key == ord(player.controls[0]):
                             player.jump(gravity)
+                        elif event.key == ord(player.controls[4]):
+                            player.powerUp = "forcepush"
+                            player.performPower()
+
 
                     elif event.type == pygame.KEYUP:
                         player.moving = False
@@ -182,10 +221,14 @@ def main():
                         player.moving = True
                         if event.key == player.controls[1]:
                             player.control(-steps_x)
-                        if event.key == player.controls[2]:
+                        elif event.key == player.controls[2]:
                             player.control(steps_x)
-                        if event.key == player.controls[0]:
+                        elif event.key == player.controls[3]:
+                            player.down()
+                        elif event.key == player.controls[0]:
                             player.jump(gravity)
+                        elif event.key == player.controls[4]:
+                            player.performPower()
                             
 
                     elif event.type == pygame.KEYUP:
@@ -230,11 +273,11 @@ def main():
                     player.falling = True
 
             for current in player_list:
-                if player != current:
+                if player != current and not player.shield:
                     if (current.x + 10 <= player.x and current.x + 50 >= player.x) and (current.y >= player.y - 10 and current.y <= player.y +90):
-                        player.pushed(5)
+                        player.pushed(current.power)
                     elif (current.x-10 >= player.x and current.x-50 <= player.x) and (current.y >= player.y - 10 and current.y <= player.y +90):
-                        player.pushed(-5)
+                        player.pushed(-current.power)
                 
             player.update()
             player.draw(world)
