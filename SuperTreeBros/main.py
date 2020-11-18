@@ -87,7 +87,7 @@ class Player:
         
         if (not self.falling): #or (self.extraJumps > 0):
             self.isJump = True
-            self.jumpCount = 10
+            self.jumpCount = 14
             #if self.extraJumps > 0:
                 #self.extraJumps -= 1
 
@@ -123,7 +123,7 @@ def main():
     #backdropbox = world.get_rect()
     main = True
     
-    gravity = 2
+    gravity = 1
     steps_x = 10
     player_list = []
     
@@ -207,16 +207,17 @@ def main():
             if player.isJump:
                 player.falling = True
                 if player.jumpCount > 0:
-                    player.fall(-gravity*0.8)
+                    player.fall(-gravity)
                     player.jumpCount -= 1
                 else:
                     player.isJump = False
                     
-            
+            #Colision de caida
             elif player.falling:
                 player.fall(gravity)
                 for plat in plat_list:
-                    if (player.x-10 >= plat.xi and player.x+45 <= plat.xi + plat.distx) and (player.y >= plat.yi - 80 and player.y <= plat.yi-46):
+                    if (player.x-10 >= plat.xi and player.x+45 <= plat.xi + plat.distx) and (player.y + 79 >= plat.yi and player.y + 79 <= plat.yi+30):
+                        player.y = plat.yi - 76
                         player.movey = 0
                         player.falling = False
                         
