@@ -243,4 +243,139 @@ def main():
         clock.tick(fps)
         
 
-main()
+#main()
+
+def ventana_controles():
+    pygame.init()
+    AZUL = (0, 26, 51)
+    BLANCO = (255, 255, 255)
+    NEGRO = (0, 0, 0)
+    SCREEN_WIDTH = 900
+    SCREEN_HEIGHT = 700
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    screen.fill(AZUL)
+    pygame.display.set_caption("CREDITOS")
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                quit()
+
+        titleFont = pygame.font.Font("freesansbold.ttf", 40)
+        letrasFont = pygame.font.Font("freesansbold.ttf", 70)
+        player1 = titleFont.render("PLAYER 1 CONTROLS:", True, BLANCO)
+        player2 = titleFont.render("PLAYER 2 CONTROLS:", True, BLANCO)
+        screen.blit(player1, (20, 20))
+        screen.blit(player2, (20, 340))
+
+        cuadrado1 = pygame.draw.rect(screen, BLANCO, (200, 100, 70, 70))
+        W = letrasFont.render("W", True, NEGRO)
+        screen.blit(W, (200, 105))
+        salto = titleFont.render("Jump", True, NEGRO)
+        screen.blit(salto, (280, 115))
+
+        cuadrado2 = pygame.draw.rect(screen, BLANCO, (200, 190, 70, 70))
+        S = letrasFont.render("S", True, NEGRO)
+        screen.blit(S, (210, 195))
+        abajo = titleFont.render("Down", True, NEGRO)
+        screen.blit(abajo, (185, 270))
+
+        cuadrado3 = pygame.draw.rect(screen, BLANCO, (290, 190, 70, 70))
+        D = letrasFont.render("D", True, NEGRO)
+        screen.blit(D, (300, 195))
+        derecha = titleFont.render("Right", True, NEGRO)
+        screen.blit(derecha, (370, 205))
+
+        cuadrado4 = pygame.draw.rect(screen, BLANCO, (110, 190, 70, 70))
+        A = letrasFont.render("A", True, NEGRO)
+        screen.blit(A, (120, 195))
+        izquierda = titleFont.render("Left", True, NEGRO)
+        screen.blit(izquierda, (20, 205))
+
+        cuadrado5 = pygame.draw.rect(screen, BLANCO, (570, 190, 70, 70))
+        G = letrasFont.render("G", True, NEGRO)
+        screen.blit(G, (580, 195))
+        power = titleFont.render("Power", True, NEGRO)
+        screen.blit(power, (660, 205))
+
+        pygame.display.update()
+
+def main_menu():
+    BLANCO = (255, 255, 255)
+    NEGRO = (0, 0, 0)
+    GRIS = (211, 211, 211)
+    pygame.init()
+    SCREEN_WIDTH = 900
+    SCREEN_HEIGHT = 700
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption("Super Tree bros")
+    # BackGround = pygame.image.load('')
+
+    running = True
+    # screen.blit(BackGround, (0, 0))
+
+    while running:  # iteration for space of the button
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                quit()
+
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        if 350 + 200 > mouse[0] > 350 and 150 + 50 > mouse[1] > 150:
+            pygame.draw.rect(screen, GRIS, (350, 150, 200, 50))
+            if click[0] == 1:
+                running = False
+                main()
+
+        else:
+            BR1 = pygame.draw.rect(screen, BLANCO, (350, 150, 200, 50))
+
+        if 350 + 200 > mouse[0] > 350 and 250 + 50 > mouse[1] > 250:
+            pygame.draw.rect(screen, GRIS, (350, 250, 200, 50))
+            if click[0] == 1:
+                running = False
+                main()
+
+        else:
+            BR2 = pygame.draw.rect(screen, BLANCO, (350, 250, 200, 50))
+
+        if 350 + 200 > mouse[0] > 350 and 350 + 50 > mouse[1] > 350:
+            pygame.draw.rect(screen, GRIS, (350, 350, 200, 50))
+            if click[0] == 1:
+                running = False
+                main()
+
+        else:
+            BR3 = pygame.draw.rect(screen, BLANCO, (350, 350, 200, 50))
+
+        if 350 + 200 > mouse[0] > 350 and 450 + 50 > mouse[1] > 450:
+            pygame.draw.rect(screen, GRIS, (350, 450, 200, 50))
+            if click[0] == 1:
+                running = False
+                ventana_controles()
+
+        else:
+            BR4 = pygame.draw.rect(screen, BLANCO, (350, 450, 200, 50))
+
+        titleFont = pygame.font.Font("freesansbold.ttf", 60)
+        gameTitle = titleFont.render("SUPER TREE BROS", True, NEGRO)
+        screen.blit(gameTitle, (150, 50))
+        textFont = pygame.font.Font("freesansbold.ttf", 28)  # font
+        text1 = textFont.render("2 JUGADORES", True, NEGRO)  # new game text
+        screen.blit(text1, (350, 165))
+        text2 = textFont.render("3 JUGADORES", True, NEGRO)  # load text
+        screen.blit(text2, (350, 265))
+        text3 = textFont.render("4 JUGADORES", True, NEGRO)  # Instructions text
+        screen.blit(text3, (350, 365))
+        text4 = textFont.render("CONTROLES", True, NEGRO)  # Credits text
+        screen.blit(text4, (350, 465))
+
+        pygame.display.update()
+
+main_menu()
