@@ -1,4 +1,3 @@
-from typing import Tuple
 
 import pygame
 import sys
@@ -32,11 +31,13 @@ class Player:
         self.isJump = False
         self.falling = True
         self.jumpCount = 0
+        self.colide = False
         self.x = x
         self.y = y
         self.movex = 0
         self.movey = 0
         self.frame = 0
+        self.extraJumps = 0
         self.images = []
         img = pygame.image.load(os.path.join('images', 'jan_stand.png'))
         self.images.append(img)
@@ -84,11 +85,16 @@ class Player:
 
     def jump(self, grv):
         
-        if not self.falling:
+        if (not self.falling): #or (self.extraJumps > 0):
             self.isJump = True
             self.jumpCount = 10
+            #if self.extraJumps > 0:
+                #self.extraJumps -= 1
+
             
-            
+    def pushed(self, pushed):
+        self.x += pushed
+    
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
         
@@ -168,9 +174,6 @@ def main():
                             player.control(steps_x)
                         elif event.key == ord(player.controls[2]):
                             player.control(-steps_x)
-                        elif event.key == ord(player.controls[0]):
-                            #player.jump()
-                            print("wtf")
                         
                             
                 else:
@@ -191,8 +194,6 @@ def main():
                             player.control(steps_x)
                         elif event.key == player.controls[2]:
                             player.control(-steps_x)
-                        elif event.key == player.controls[0]:
-                            print("wtf")
 
                         
         world.fill((0,0,0))
@@ -202,11 +203,11 @@ def main():
             plat.draw()
 
         for player in player_list:
-
+            #player.extraJumps = 1
             if player.isJump:
                 player.falling = True
                 if player.jumpCount > 0:
-                    player.fall(-gravity)
+                    player.fall(-gravity*0.8)
                     player.jumpCount -= 1
                 else:
                     player.isJump = False
@@ -215,18 +216,25 @@ def main():
             elif player.falling:
                 player.fall(gravity)
                 for plat in plat_list:
-                    if (player.x-10 >= plat.xi and player.x+45 <= plat.xi + plat.distx) and (player.y >= plat.yi - 80 and player.y <= plat.yi-45):
+                    if (player.x-10 >= plat.xi and player.x+45 <= plat.xi + plat.distx) and (player.y >= plat.yi - 80 and player.y <= plat.yi-46):
                         player.movey = 0
                         player.falling = False
                         
             else:
                 checks = 0
                 for plat in plat_list:
-                    if player.x < plat.xi or player.x+55 > plat.xi + plat.distx:
+                    if player.x < plat.xi or player.x+45 > plat.xi + plat.distx:
                         checks += 1
                 if checks == 3:
                     player.falling = True
-                        
+
+            for current in player_list:
+                if player != current:
+                    if (current.x + 10 <= player.x and current.x + 50 >= player.x) and (current.y >= player.y - 10 and current.y <= player.y +90):
+                        player.pushed(5)
+                    elif (current.x-10 >= player.x and current.x-50 <= player.x) and (current.y >= player.y - 10 and current.y <= player.y +90):
+                        player.pushed(-5)
+                
             player.update()
             player.draw(world)
 
