@@ -1,7 +1,6 @@
 
 import pygame
-import sys
-import os
+import sys, os, random
 
 '''
 Variables
@@ -27,6 +26,7 @@ class Player(object):
     def __init__(self, controls, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.controls = controls
+        self.pressed = [False, False]
         self.moving = False
         self.isJump = False
         self.falling = True
@@ -40,7 +40,9 @@ class Player(object):
         self.frame = 0
         self.extraJumps = 0
         self.shield = False
+        self.ticks = 0
         self.power = 10
+        self.powerEnable = False
         self.images = []
         img = pygame.image.load(os.path.join('images', 'jan_stand.png'))
         self.images.append(img)
@@ -108,9 +110,12 @@ class Player(object):
             self.isJump = True
             self.jumpCount = 35
             self.extraJumps = 0
+            self.powerEnable = False
+            self.powerUp = ""
 
     def performPower(self):
         if self.powerUp != "":
+            self.powerEnable = True
             if self.powerUp == "forcepush":
                 self.power = 50
             elif self.powerUp == "extrajump":
@@ -124,14 +129,48 @@ class Player(object):
     def down(self):
         self.image = self.images[5]
 
+    def checkTime(self):
+        if (self.powerUp == "shield" or "forcepush") and self.powerEnable == True:
+            return True
+        else:
+            return False
+
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
 
 
 
 class Powerups:
-    def __init__(self):
-        print("")
+    def __init__(self, screen, stype, xi, yi):
+        self.type = stype
+        self.x = xi
+        self.y = yi
+        self.distx = 30
+        self.disty = 30
+        self.screen = screen
+        self.movey = 0
+        self.falling = True
+        self.catch = False
+        self.ticks = 0
+        #self.image = image
+
+        if self.type == "extrajump":
+            self.color = (180,0,0)
+        elif self.type == "forcepush":
+            self.color = (0,180,0)
+        elif self.type == "shield":
+            self.color = (0,0,180)
+
+    def fall(self, grv):
+        self.movey += grv
+
+    def update(self):
+        if self.falling:
+            self.y = self.y + self.movey
+    
+    def draw(self):
+        pygame.draw.rect(self.screen, self.color, (self.x, self.y, self.distx, self.disty))
+
 
 class Platform:
     def __init__(self, screen, xi, yi, distx, disty):
@@ -141,11 +180,10 @@ class Platform:
         self.disty = disty
         self.color = (90, 70, 50)
         self.screen = screen
+        self.ticks = 0
 
     def draw(self):
         pygame.draw.rect(self.screen, self.color, (self.xi, self.yi, self.distx, self.disty))
-    
-        
 
 def main():
     '''
@@ -160,6 +198,12 @@ def main():
     gravity = 1
     steps_x = 10
     player_list = []
+    powerup_list = []
+    powerup_types = ["forcepush","shield","extrajump"]
+    
+    crono = 0
+    flag = True
+    flag2 = True
     
     player1 = Player(['w', 'a', 'd', 's','g'], 100, 100)  # spawn player
     player_list.append(player1)
@@ -178,7 +222,45 @@ def main():
     Main Loop
     '''
 
+    ref_crono = (pygame.time.get_ticks()) // 1000
+    
     while main:
+        
+        crono = ((pygame.time.get_ticks()) // 1000) - ref_crono
+        
+
+        if crono%30 == 0 and crono != 0 and flag:
+            positionx = random.randint(50, 850)
+            p_type = random.randint(0,2)
+            powerup_list.append(Powerups(world, powerup_types[p_type], positionx, 0))
+            flag = False
+
+        elif crono%30 != 0 and crono != 0 and not flag:
+            flag = True
+
+        if crono>=30 and crono%2 == 0 and flag2:
+            for power in powerup_list:
+                power.ticks += 1
+                if power.ticks > 7:
+                    powerup_list.pop(powerup_list.index(power))
+
+            for player in player_list:
+                if player.checkTime():
+                    player.ticks += 1
+                    if player.ticks > 6:
+                        player.ticks = 0
+                        player.powerEnable = False
+                        print("Finalizado: "+player.powerUp)
+                        player.powerUp = ""
+                        player.shield = False
+                        player.power = 10
+            
+            flag2 = False
+
+            
+        elif crono>=30 and crono%2 != 0 and not flag2:
+            flag2 = True
+        ###Programar un cronometro para cada objeto#### Esto para que sepa cuando desaparecer
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -195,24 +277,31 @@ def main():
 
                         player.moving = True
                         if event.key == ord(player.controls[1]):
+                            player.pressed[0] = True
                             player.control(-steps_x)
                         elif event.key == ord(player.controls[2]):
+                            player.pressed[1] = True
                             player.control(steps_x)
                         elif event.key == ord(player.controls[3]):
                             player.down()
                         elif event.key == ord(player.controls[0]):
                             player.jump(gravity)
                         elif event.key == ord(player.controls[4]):
-                            player.powerUp = "forcepush"
-                            player.performPower()
+                            if player.powerUp != "":
+                                print(player.powerUp)
+                                player.performPower()
 
 
                     elif event.type == pygame.KEYUP:
-                        player.moving = False
+                        
                         if event.key == ord(player.controls[1]):
+                            player.pressed[0] = False
                             player.control(steps_x)
                         elif event.key == ord(player.controls[2]):
+                            player.pressed[1] = False
                             player.control(-steps_x)
+                        if not player.pressed[0] and not player.pressed[1]:
+                            player.moving = False
                         
                             
                 else:
@@ -220,23 +309,30 @@ def main():
                         
                         player.moving = True
                         if event.key == player.controls[1]:
+                            player.pressed[0] = True
                             player.control(-steps_x)
                         elif event.key == player.controls[2]:
+                            player.pressed[1] = True
                             player.control(steps_x)
                         elif event.key == player.controls[3]:
                             player.down()
                         elif event.key == player.controls[0]:
                             player.jump(gravity)
                         elif event.key == player.controls[4]:
-                            player.performPower()
+                            if player.powerUp != "":
+                                print(player.powerUp)
+                                player.performPower()
                             
 
                     elif event.type == pygame.KEYUP:
-                        player.moving = False
                         if event.key == player.controls[1]:
                             player.control(steps_x)
+                            player.pressed[0] = False
                         elif event.key == player.controls[2]:
                             player.control(-steps_x)
+                            player.pressed[1] = False
+                        if not player.pressed[0] and not player.pressed[1]:
+                            player.moving = False
 
                         
         world.fill((0,0,0))
@@ -279,14 +375,40 @@ def main():
                     elif (current.x-10 >= player.x and current.x-50 <= player.x) and (current.y >= player.y - 10 and current.y <= player.y +90):
                         player.pushed(-current.power)
                 
+
+            for power in powerup_list:
+                if player.x-10 <= power.x+15 and player.x+100 >= power.x+15 and player.y <= power.y+15 and player.y+90 >= power.y+15:
+                    if not player.powerEnable and player.powerUp == "":
+                        player.powerUp = power.type
+                        print("obtenido: "+power.type)
+                        powerup_list.pop(powerup_list.index(power))
+                    
+            
             player.update()
             player.draw(world)
 
+
+        for power in powerup_list:
+            for plat in plat_list:
+                if power.x-10 >= plat.xi and power.x + 30 <= plat.xi + plat.distx and power.y+30 >= plat.yi and power.y+30 <= plat.yi+30:
+                    power.y = plat.yi - 30
+                    power.falling = False
+            if power.y > 700:
+                powerup_list.pop(powerup_list.index(power))
+                    
+            if power.falling:
+                power.fall(gravity*0.5)
+                    
+            power.update()
+            power.draw()
+            
+        
         pygame.display.flip()
         clock.tick(fps)
         
 
-#main()
+
+
 
 def ventana_controles():
     pygame.init()
@@ -345,6 +467,9 @@ def ventana_controles():
         screen.blit(power, (660, 205))
 
         pygame.display.update()
+
+
+
 
 def main_menu():
     BLANCO = (255, 255, 255)
