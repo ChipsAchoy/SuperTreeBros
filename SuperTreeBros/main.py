@@ -108,7 +108,7 @@ class Player(object):
         elif self.extraJumps > 0:
             self.image = self.images[4]
             self.isJump = True
-            self.jumpCount = 35
+            self.jumpCount = 25
             self.extraJumps = 0
             self.powerEnable = False
             self.powerUp = ""
@@ -287,7 +287,7 @@ def main():
                         elif event.key == ord(player.controls[0]):
                             player.jump(gravity)
                         elif event.key == ord(player.controls[4]):
-                            if player.powerUp != "":
+                            if player.powerUp != "" and not player.powerEnable:
                                 print(player.powerUp)
                                 player.performPower()
 
@@ -319,7 +319,7 @@ def main():
                         elif event.key == player.controls[0]:
                             player.jump(gravity)
                         elif event.key == player.controls[4]:
-                            if player.powerUp != "":
+                            if player.powerUp != "" and not player.powerEnable:
                                 print(player.powerUp)
                                 player.performPower()
                             
