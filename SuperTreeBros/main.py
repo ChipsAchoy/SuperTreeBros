@@ -408,8 +408,6 @@ def main():
         
 
 
-
-
 def ventana_controles():
     pygame.init()
     AZUL = (0, 26, 51)
@@ -419,7 +417,7 @@ def ventana_controles():
     SCREEN_HEIGHT = 700
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.fill(AZUL)
-    pygame.display.set_caption("CREDITOS")
+    pygame.display.set_caption("CONTROLES")
 
     running = True
     while running:
@@ -460,16 +458,43 @@ def ventana_controles():
         izquierda = titleFont.render("Left", True, NEGRO)
         screen.blit(izquierda, (20, 205))
 
-        cuadrado5 = pygame.draw.rect(screen, BLANCO, (570, 190, 70, 70))
+        power1 = pygame.draw.rect(screen, BLANCO, (570, 190, 70, 70))
         G = letrasFont.render("G", True, NEGRO)
         screen.blit(G, (580, 195))
-        power = titleFont.render("Power", True, NEGRO)
-        screen.blit(power, (660, 205))
+        power1 = titleFont.render("Power", True, NEGRO)
+        screen.blit(power1, (660, 205))
+
+        flecha1 = pygame.draw.rect(screen, BLANCO, (200, 420, 70, 70))
+        cordenadas1 = [(235, 430), (250, 470), (220, 470)]
+        pygame.draw.polygon(screen, NEGRO, cordenadas1, 0)
+        salto2 = titleFont.render("Jump", True, NEGRO)
+        screen.blit(salto2, (280, 435))
+
+        flecha2 = pygame.draw.rect(screen, BLANCO, (200, 520, 70, 70))
+        cordenadas2 = [(235, 575), (250, 535), (220, 535)]
+        pygame.draw.polygon(screen, NEGRO, cordenadas2, 0)
+        abajo2 = titleFont.render("Down", True, NEGRO)
+        screen.blit(abajo2, (185, 600))
+
+        flecha3 = pygame.draw.rect(screen, BLANCO, (290, 520, 70, 70))
+        cordenadas3 = [(305, 540), (305, 570), (350, 555)]
+        pygame.draw.polygon(screen, NEGRO, cordenadas3, 0)
+        derecha2 = titleFont.render("Right", True, NEGRO)
+        screen.blit(derecha2, (370, 535))
+
+        flecha4 = pygame.draw.rect(screen, BLANCO, (110, 520, 70, 70))
+        cordenadas4 = [(120, 555), (165, 540), (165, 570)]
+        pygame.draw.polygon(screen, NEGRO, cordenadas4, 0)
+        izquierda2 = titleFont.render("Left", True, NEGRO)
+        screen.blit(izquierda2, (20, 535))
+
+        power2 = pygame.draw.rect(screen, BLANCO, (570, 520, 140, 70))
+        SHIFTD = titleFont.render("SHIFTD", True, NEGRO)
+        screen.blit(SHIFTD, (565, 535))
+        screen.blit(power1, (730, 535))
 
         pygame.display.update()
-
-
-
+        
 
 def main_menu():
     BLANCO = (255, 255, 255)
