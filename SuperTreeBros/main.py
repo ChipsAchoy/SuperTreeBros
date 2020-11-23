@@ -9,7 +9,6 @@ Variables
 worldx = 900
 worldy = 700
 fps = 40
-ani = 4
 world = pygame.display.set_mode([worldx, worldy])
 
 
@@ -23,7 +22,7 @@ class Player(object):
     Spawn a player
     """
 
-    def __init__(self, controls, x, y):
+    def __init__(self, controls, x, y, character):
         pygame.sprite.Sprite.__init__(self)
         self.controls = controls
         self.pressed = [False, False]
@@ -44,16 +43,39 @@ class Player(object):
         self.power = 10
         self.powerEnable = False
         self.images = []
-        img = pygame.image.load(os.path.join('images', 'jan_stand.png'))
+        
+
+        if character == 0:
+            self.character = "firzen"
+            self.steps_x = 11
+            self.maxJump = 13
+        elif character == 1:
+            self.character = "jack"
+            self.steps_x = 8
+            self.maxJump = 20
+        elif character == 2:
+            self.character = "jan"
+            self.steps_x = 20
+            self.maxJump = 14
+        elif character == 3:
+            self.character = "justin"
+            self.steps_x = 6
+            self.maxJump = 13
+        elif character == 4:
+            self.character = "louisEX"
+            self.steps_x = 15
+            self.maxJump = 13
+
+        img = pygame.image.load(os.path.join('images/Sprites/'+self.character, self.character+'_stand.png'))
         self.images.append(img)
         self.image = self.images[0]
         
         for i in range(1,4):
-            img = pygame.image.load(os.path.join('images', 'jan_run' + str(i) + '.png'))
+            img = pygame.image.load(os.path.join('images/Sprites/'+self.character, self.character+'_run' + str(i) + '.png'))
             self.images.append(img)
-        img = pygame.image.load(os.path.join('images', 'jan_jump.png'))
+        img = pygame.image.load(os.path.join('images/Sprites/'+self.character, self.character+'_jump.png'))
         self.images.append(img)
-        img = pygame.image.load(os.path.join('images', 'jan_land.png'))
+        img = pygame.image.load(os.path.join('images/Sprites/'+self.character, self.character+'_land.png'))
         self.images.append(img)
 
     def control(self, x):
@@ -104,7 +126,7 @@ class Player(object):
         if not self.falling : #or (self.extraJumps > 0):
             self.image = self.images[4]
             self.isJump = True
-            self.jumpCount = 14
+            self.jumpCount = self.maxJump
         elif self.extraJumps > 0:
             self.image = self.images[4]
             self.isJump = True
@@ -141,7 +163,7 @@ class Player(object):
 
 
 class Powerups:
-    def __init__(self, screen, stype, xi, yi):
+    def __init__(self, screen, stype, xi, yi, image):
         self.type = stype
         self.x = xi
         self.y = yi
@@ -152,14 +174,7 @@ class Powerups:
         self.falling = True
         self.catch = False
         self.ticks = 0
-        #self.image = image
-
-        if self.type == "extrajump":
-            self.color = (180,0,0)
-        elif self.type == "forcepush":
-            self.color = (0,180,0)
-        elif self.type == "shield":
-            self.color = (0,0,180)
+        self.image = image
 
     def fall(self, grv):
         self.movey += grv
@@ -169,51 +184,60 @@ class Powerups:
             self.y = self.y + self.movey
     
     def draw(self):
-        pygame.draw.rect(self.screen, self.color, (self.x, self.y, self.distx, self.disty))
+        self.screen.blit(self.image, (self.x, self.y))
 
 
 class Platform:
-    def __init__(self, screen, xi, yi, distx, disty):
+    def __init__(self, screen, xi, yi, distx, disty, image):
         self.xi = xi
         self.yi = yi
         self.distx = distx
         self.disty = disty
-        self.color = (90, 70, 50)
         self.screen = screen
         self.ticks = 0
+        self.image = image
 
     def draw(self):
-        pygame.draw.rect(self.screen, self.color, (self.xi, self.yi, self.distx, self.disty))
+        self.screen.blit(self.image, (self.xi, self.yi))
 
 def main():
     '''
     Setup
     '''
-    backdrop = pygame.image.load("images/bg.png")
+    backdrop = pygame.image.load("images/background/bg.png")
+    platImage1 = pygame.image.load("images/Platforms/small_platform.png")
+    platImage2 = pygame.image.load("images/Platforms/big_platform.png")
+
+    force_image = pygame.image.load("images/powericons/forcepush.png")
+    shield_image = pygame.image.load("images/powericons/shield.png")
+    jump_image = pygame.image.load("images/powericons/jump.png")
+
+    
     clock = pygame.time.Clock()
     pygame.init()
     #backdropbox = world.get_rect()
     main = True
     
     gravity = 1
-    steps_x = 10
+    #steps_x = 10
     player_list = []
     powerup_list = []
     powerup_types = ["forcepush","shield","extrajump"]
+    powerup_images = [force_image, shield_image, jump_image]
     
     crono = 0
     flag = True
     flag2 = True
     
-    player1 = Player(['w', 'a', 'd', 's','g'], 100, 100)  # spawn player
+    player1 = Player(['w', 'a', 'd', 's','g'], 100, 100,1)  # spawn player
     player_list.append(player1)
 
-    player2 = Player([pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_RSHIFT], 750, 100)  # spawn player
+    player2 = Player([pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_RSHIFT], 750, 100,4)  # spawn player
     player_list.append(player2)
     
-    plat1 = Platform(world, 250, 450, 400, 30)
-    plat2 = Platform(world, 50, 300, 150, 30)
-    plat3 = Platform(world, 700, 300, 150, 30)
+    plat1 = Platform(world, 250, 450, 400, 30, platImage2)
+    plat2 = Platform(world, 50, 300, 150, 30, platImage1)
+    plat3 = Platform(world, 700, 300, 150, 30, platImage1)
 
     plat_list = [plat1, plat2, plat3]
     print(plat_list)
@@ -232,7 +256,7 @@ def main():
         if crono%30 == 0 and crono != 0 and flag:
             positionx = random.randint(50, 850)
             p_type = random.randint(0,2)
-            powerup_list.append(Powerups(world, powerup_types[p_type], positionx, 0))
+            powerup_list.append(Powerups(world, powerup_types[p_type], positionx, 0, powerup_images[p_type]))
             flag = False
 
         elif crono%30 != 0 and crono != 0 and not flag:
@@ -278,10 +302,10 @@ def main():
                         player.moving = True
                         if event.key == ord(player.controls[1]):
                             player.pressed[0] = True
-                            player.control(-steps_x)
+                            player.control(-player.steps_x)
                         elif event.key == ord(player.controls[2]):
                             player.pressed[1] = True
-                            player.control(steps_x)
+                            player.control(player.steps_x)
                         elif event.key == ord(player.controls[3]):
                             player.down()
                         elif event.key == ord(player.controls[0]):
@@ -296,10 +320,10 @@ def main():
                         
                         if event.key == ord(player.controls[1]):
                             player.pressed[0] = False
-                            player.control(steps_x)
+                            player.control(player.steps_x)
                         elif event.key == ord(player.controls[2]):
                             player.pressed[1] = False
-                            player.control(-steps_x)
+                            player.control(-player.steps_x)
                         if not player.pressed[0] and not player.pressed[1]:
                             player.moving = False
                         
@@ -310,10 +334,10 @@ def main():
                         player.moving = True
                         if event.key == player.controls[1]:
                             player.pressed[0] = True
-                            player.control(-steps_x)
+                            player.control(-player.steps_x)
                         elif event.key == player.controls[2]:
                             player.pressed[1] = True
-                            player.control(steps_x)
+                            player.control(player.steps_x)
                         elif event.key == player.controls[3]:
                             player.down()
                         elif event.key == player.controls[0]:
@@ -326,10 +350,10 @@ def main():
 
                     elif event.type == pygame.KEYUP:
                         if event.key == player.controls[1]:
-                            player.control(steps_x)
+                            player.control(player.steps_x)
                             player.pressed[0] = False
                         elif event.key == player.controls[2]:
-                            player.control(-steps_x)
+                            player.control(-player.steps_x)
                             player.pressed[1] = False
                         if not player.pressed[0] and not player.pressed[1]:
                             player.moving = False
