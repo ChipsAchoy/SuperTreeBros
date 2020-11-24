@@ -2,6 +2,8 @@
 import pygame
 import sys, os, random
 
+selectedPlayers = [-1, -1]
+
 '''
 Variables
 '''
@@ -429,6 +431,203 @@ def main():
         
         pygame.display.flip()
         clock.tick(fps)
+
+def escoger_jugador():
+    #Base de la ventana
+    pygame.init()
+    running = True
+    SCREEN_WIDTH = 900
+    SCREEN_HEIGHT = 700
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption("ESCOGER EL JUGADOR")
+
+    #Colores
+    GRIS = (100, 100, 100)
+    BLANCO = (255, 255, 255)
+    NEGRO = (0, 0, 0)
+    AZUL = (0, 26, 51)
+
+    #Textos y fonts
+    titleFont = pygame.font.Font("freesansbold.ttf", 40)
+    subtitleFONT = pygame.font.Font("freesansbold.ttf", 20)
+    player1 = titleFont.render("PLAYER 1", True, BLANCO)
+    player2 = titleFont.render("PLAYER 2", True, BLANCO)
+    FIJAR = titleFont.render("FIJAR", True, NEGRO)
+
+    FIRZEN = subtitleFONT.render("Jugador seleccionado: FIRZEN", True, BLANCO)
+    JACK = subtitleFONT.render("Jugador seleccionado: JACK", True, BLANCO)
+    JAN = subtitleFONT.render("Jugador seleccionado: JAN", True, BLANCO)
+    JUSTIN = subtitleFONT.render("Jugador seleccionado: JUSTIN", True, BLANCO)
+    LOUISEX = subtitleFONT.render("Jugador seleccionado: LOUISEX", True, BLANCO)
+    NINGUNO = subtitleFONT.render("Jugador seleccionado: ", True, BLANCO)
+
+    #Imagenes de los jugadores
+    firzen = pygame.image.load("images/Sprites/firzen/firzen_splash.png")
+    jack = pygame.image.load("images/Sprites/jack/jack_splash.png")
+    jan = pygame.image.load("images/Sprites/jan/jan_splash.png")
+    justin = pygame.image.load("images/Sprites/justin/justin_splash.png")
+    louisex = pygame.image.load("images/Sprites/louisEX/louisEX_splash.png")
+
+
+    listaFlag = [False, False, False, False, False]
+    listaFlag2 = [False, False, False, False, False]
+    selected1 = -1
+    selected2 = -1
+    global selectedPlayers
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                quit()
+
+        screen.fill(AZUL)
+        pygame.draw.line(screen, NEGRO, (450, 0), (450, 900), 5)
+        screen.blit(player1, (150, 50))
+        screen.blit(player2, (575, 50))
+
+        # Mouse, click y prosiciones de los cuadros
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+        personaje0 = 100 + 120 > mouse[0] > 100 and 150 + 120 > mouse[1] > 150 and click[0] == 1
+        personaje1 = 250 + 120 > mouse[0] > 250 and 150 + 120 > mouse[1] > 150 and click[0] == 1
+        personaje2 = 100 + 120 > mouse[0] > 100 and 300 + 120 > mouse[1] > 300 and click[0] == 1
+        personaje3 = 250 + 120 > mouse[0] > 250 and 300 + 120 > mouse[1] > 300 and click[0] == 1
+        personaje4 = 175 + 120 > mouse[0] > 175 and 450 + 120 > mouse[1] > 450 and click[0] == 1
+
+        listaPersonajes = [personaje0, personaje1, personaje2, personaje3, personaje4]
+
+
+        if click[0] == 1:
+            for i in range(len(listaPersonajes)):
+                if listaPersonajes[i] == True:
+                    selected1 = i
+                    break
+
+            for i in range(len(listaFlag)):
+                if i == selected1:
+                    listaFlag[i] = True
+                else:
+                    listaFlag[i] = False
+        else:
+            screen.blit(NINGUNO, (100, 100))
+
+        if listaFlag[0] == True:
+            screen.blit(FIRZEN, (100, 100))
+        if listaFlag[1] == True:
+            screen.blit(JACK, (100, 100))
+        if listaFlag[2] == True:
+            screen.blit(JAN, (100, 100))
+        if listaFlag[3] == True:
+            screen.blit(JUSTIN, (100, 100))
+        if listaFlag[4] == True:
+            screen.blit(LOUISEX, (100, 100))
+
+        #Cuadros para seleccionar personajes:
+
+        #SELECCION DEL PEROSNAJE 1
+        #Personaje 0
+        screen.blit(firzen, (100, 150))
+        pygame.draw.rect(screen, NEGRO, (100, 150, 120, 120), 2)
+
+        #Personaje 1
+        screen.blit(jack, (250, 150))
+        pygame.draw.rect(screen, NEGRO, (250, 150, 120, 120), 2)
+
+        #Personaje 2
+        screen.blit(jan, (100, 300))
+        pygame.draw.rect(screen, NEGRO, (100, 300, 120, 120), 2)
+
+        #Personaje 3
+        screen.blit(justin, (250, 300))
+        pygame.draw.rect(screen, NEGRO, (250, 300, 120, 120), 2)
+
+        #Personaje 4
+        screen.blit(louisex, (175, 450))
+        pygame.draw.rect(screen, NEGRO, (175, 450, 120, 120), 2)
+
+        #Botones de fijar1
+        if 125 + 200 > mouse[0] > 125 and 580 + 50 > mouse[1] > 580:
+            pygame.draw.rect(screen, GRIS, (125, 580, 200, 50))
+            if click[0] == 1:
+                selectedPlayers[0] = selected1
+                print(selectedPlayers)
+        else:
+            pygame.draw.rect(screen, BLANCO, (125, 580, 200, 50))
+        screen.blit(FIJAR, (160, 585))
+
+
+        #SELECCION DEL PEROSNAJE 2
+
+        personaje5 = 525 + 120 > mouse[0] > 525 and 150 + 120 > mouse[1] > 150 and click[0] == 1 #(525, 150, 120, 120)
+        personaje6 = 675 + 120 > mouse[0] > 675 and 150 + 120 > mouse[1] > 150 and click[0] == 1 #(675, 150, 120, 120)
+        personaje7 = 525 + 120 > mouse[0] > 525 and 300 + 120 > mouse[1] > 300 and click[0] == 1 #(525, 300, 120, 120)
+        personaje8 = 675 + 120 > mouse[0] > 675 and 300 + 120 > mouse[1] > 300 and click[0] == 1 #(675, 300, 120, 120)
+        personaje9 = 600 + 120 > mouse[0] > 600 and 450 + 120 > mouse[1] > 450 and click[0] == 1 #(600, 450, 120, 120)
+
+        listaPersonajes2 = [personaje5, personaje6, personaje7, personaje8, personaje9]
+
+        if click[0] == 1:
+            for i in range(len(listaPersonajes2)):
+                if listaPersonajes2[i] == True:
+                    selected2 = i
+                    break
+
+            for i in range(len(listaFlag2)):
+                if i == selected2:
+                    listaFlag2[i] = True
+                else:
+                    listaFlag2[i] = False
+        else:
+            screen.blit(NINGUNO, (500, 100))
+
+        if listaFlag2[0] == True:
+            screen.blit(FIRZEN, (500, 100))
+        if listaFlag2[1] == True:
+            screen.blit(JACK, (500, 100))
+        if listaFlag2[2] == True:
+            screen.blit(JAN, (500, 100))
+        if listaFlag2[3] == True:
+            screen.blit(JUSTIN, (500, 100))
+        if listaFlag2[4] == True:
+            screen.blit(LOUISEX, (500, 100))
+
+        #Personaje 0
+        screen.blit(firzen, (525, 150))
+        pygame.draw.rect(screen, NEGRO, (525, 150, 120, 120), 2)
+
+        #Personaje 1
+        screen.blit(jack, (675, 150))
+        pygame.draw.rect(screen, NEGRO, (675, 150, 120, 120), 2)
+
+        #Personaje 2
+        screen.blit(jan, (525, 300))
+        pygame.draw.rect(screen, NEGRO, (525, 300, 120, 120), 2)
+
+        #Personaje 3
+        screen.blit(justin, (675, 300))
+        pygame.draw.rect(screen, NEGRO, (675, 300, 120, 120), 2)
+
+        #Personaje 4
+        screen.blit(louisex, (600, 450))
+        pygame.draw.rect(screen, NEGRO, (600, 450, 120, 120), 2)
+
+        if 550 + 200 > mouse[0] > 550 and 580 + 50 > mouse[1] > 580:
+            pygame.draw.rect(screen, GRIS, (550, 580, 200, 50))
+            if click[0] == 1:
+                selectedPlayers[1] = selected2
+                print(selectedPlayers)
+        else:
+            pygame.draw.rect(screen, BLANCO, (550, 580, 200, 50))
+        screen.blit(FIJAR, (590, 585))
+
+        if selectedPlayers[0] != -1 and selectedPlayers[1] != -1:
+            print("listo")
+
+        pygame.display.update()
+
+escoger_jugador()
         
 
 
