@@ -42,31 +42,44 @@ class Player(object):
         self.extraJumps = 0
         self.shield = False
         self.ticks = 0
-        self.power = 10
         self.powerEnable = False
         self.images = []
-        
 
         if character == 0:
             self.character = "firzen"
+            self.height = 77
             self.steps_x = 11
             self.maxJump = 13
+            self.power = 10
+            self.maxPower = 10
         elif character == 1:
+            self.height = 71
             self.character = "jack"
             self.steps_x = 8
             self.maxJump = 20
+            self.power = 11
+            self.maxPower = 11
         elif character == 2:
+            self.height = 80
             self.character = "jan"
-            self.steps_x = 20
+            self.steps_x = 17
             self.maxJump = 14
+            self.power = 8
+            self.maxPower = 8
         elif character == 3:
             self.character = "justin"
+            self.height = 71
             self.steps_x = 6
             self.maxJump = 13
+            self.power = 18
+            self.maxPower = 18
         elif character == 4:
             self.character = "louisEX"
+            self.height = 74
             self.steps_x = 15
             self.maxJump = 13
+            self.power = 10
+            self.maxPower = 10
 
         img = pygame.image.load(os.path.join('images/Sprites/'+self.character, self.character+'_stand.png'))
         self.images.append(img)
@@ -132,7 +145,7 @@ class Player(object):
         elif self.extraJumps > 0:
             self.image = self.images[4]
             self.isJump = True
-            self.jumpCount = 25
+            self.jumpCount = 26
             self.extraJumps = 0
             self.powerEnable = False
             self.powerUp = ""
@@ -206,6 +219,7 @@ def main():
     '''
     Setup
     '''
+    global selectedPlayers
     backdrop = pygame.image.load("images/background/bg.png")
     platImage1 = pygame.image.load("images/Platforms/small_platform.png")
     platImage2 = pygame.image.load("images/Platforms/big_platform.png")
@@ -231,10 +245,10 @@ def main():
     flag = True
     flag2 = True
     
-    player1 = Player(['w', 'a', 'd', 's','g'], 100, 100,1)  # spawn player
+    player1 = Player(['w', 'a', 'd', 's','g'], 100, 100,selectedPlayers[0])  # spawn player
     player_list.append(player1)
 
-    player2 = Player([pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_RSHIFT], 750, 100,4)  # spawn player
+    player2 = Player([pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_RSHIFT], 750, 100,selectedPlayers[1])  # spawn player
     player_list.append(player2)
     
     plat1 = Platform(world, 250, 450, 400, 30, platImage2)
@@ -279,7 +293,7 @@ def main():
                         print("Finalizado: "+player.powerUp)
                         player.powerUp = ""
                         player.shield = False
-                        player.power = 10
+                        player.power = player.maxPower
             
             flag2 = False
 
@@ -381,8 +395,8 @@ def main():
             elif player.falling:
                 player.fall(gravity)
                 for plat in plat_list:
-                    if (player.x-10 >= plat.xi and player.x+45 <= plat.xi + plat.distx) and (player.y + 79 >= plat.yi and player.y + 79 <= plat.yi+30):
-                        player.y = plat.yi - 76
+                    if (player.x-10 >= plat.xi and player.x+45 <= plat.xi + plat.distx) and (player.y + player.height >= plat.yi and player.y + player.height <= plat.yi+30):
+                        player.y = plat.yi - player.height
                         player.movey = 0
                         player.falling = False
                         
@@ -623,12 +637,9 @@ def escoger_jugador():
         screen.blit(FIJAR, (590, 585))
 
         if selectedPlayers[0] != -1 and selectedPlayers[1] != -1:
-            print("listo")
+            main()
 
         pygame.display.update()
-
-escoger_jugador()
-        
 
 
 def ventana_controles():
@@ -747,7 +758,7 @@ def main_menu():
             pygame.draw.rect(screen, GRIS, (350, 150, 200, 50))
             if click[0] == 1:
                 running = False
-                main()
+                escoger_jugador()
 
         else:
             BR1 = pygame.draw.rect(screen, BLANCO, (350, 150, 200, 50))
