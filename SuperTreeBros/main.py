@@ -44,6 +44,10 @@ class Player(object):
         self.ticks = 0
         self.powerEnable = False
         self.images = []
+        self.titleFont = pygame.font.Font("freesansbold.ttf", 18)
+        self.vida = 3
+        self.VIDA = self.titleFont.render(str(self.vida), True, (0, 0, 0))
+        
 
         if character == 0:
             self.character = "firzen"
@@ -92,6 +96,7 @@ class Player(object):
         self.images.append(img)
         img = pygame.image.load(os.path.join('images/Sprites/'+self.character, self.character+'_land.png'))
         self.images.append(img)
+        
 
     def control(self, x):
         """
@@ -172,10 +177,16 @@ class Player(object):
         else:
             return False
 
-    def draw(self, surface):
+    def draw(self, surface, current):
         surface.blit(self.image, (self.x, self.y))
-
-
+        self.VIDA = self.titleFont.render(str(self.vida), True, (0, 0, 0))
+        if current:
+            surface.blit(self.VIDA, (75, 676))
+        else:
+            surface.blit(self.VIDA, (810, 676))
+            
+        
+        
 
 class Powerups:
     def __init__(self, screen, stype, xi, yi, image):
@@ -229,13 +240,10 @@ class Frames:
         self.player3 = pygame.image.load('images/PlayerFrames/justin_frame.png')
         self.player4 = pygame.image.load('images/PlayerFrames/louisEX_frame.png')
         self.listaFrames = [self.player0, self.player1, self.player2, self.player3, self.player4]
-        self.vidas1 = 3
-        self.vidas2 = 3
         self.titleFont = pygame.font.Font("freesansbold.ttf", 20)
         self.PLAYER1 = self.titleFont.render("PLAYER 1", True, (0, 0, 0))
         self.PLAYER2 = self.titleFont.render("PLAYER 2", True, (0, 0, 0))
-        self.VIDA1 = self.titleFont.render(str(self.vidas1), True, (0, 0, 0))
-        self.VIDA2 = self.titleFont.render(str(self.vidas2), True, (0, 0, 0))
+        
 
     def drawFrames(self, world):
         for i in range(len(self.listaFrames)):
@@ -253,9 +261,7 @@ class Frames:
 
         world.blit(self.PLAYER1, (self.x1 + 30, self.y1))
         world.blit(self.PLAYER2, (self.x2 + 30, self.y2))
-
-        world.blit(self.VIDA1, (70, 676))
-        world.blit(self.VIDA2, (810, 676))
+               
 
 def main():
     '''
@@ -386,7 +392,7 @@ def main():
                             player.control(-player.steps_x)
                         if not player.pressed[0] and not player.pressed[1]:
                             player.moving = False
-                        
+  
                             
                 else:
                     if event.type == pygame.KEYDOWN:
@@ -421,11 +427,17 @@ def main():
                         
         world.fill((0,0,0))
         world.blit(backdrop, (0,0))
+        fs.drawFrames(world)
 
         for plat in plat_list:
             plat.draw()
 
         for player in player_list:
+            cord = True
+            if player == player_list[0]:
+                cord = True
+            elif player == player_list[1]:
+                cord = False
             #player.extraJumps = 1
             if player.isJump:
                 player.falling = True
@@ -443,7 +455,11 @@ def main():
                         player.y = plat.yi - player.height
                         player.movey = 0
                         player.falling = False
+                if player.y >= 700:
+                    player.vida -= 1
+                                
                         
+########################################################################################################################################
             else:
                 checks = 0
                 for plat in plat_list:
@@ -466,10 +482,9 @@ def main():
                         player.powerUp = power.type
                         print("obtenido: "+power.type)
                         powerup_list.pop(powerup_list.index(power))
-                    
-            fs.drawFrames(world) 
+                     
             player.update()
-            player.draw(world)
+            player.draw(world, cord)
 
 
         for power in powerup_list:
