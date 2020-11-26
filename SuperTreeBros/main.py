@@ -215,6 +215,48 @@ class Platform:
     def draw(self):
         self.screen.blit(self.image, (self.xi, self.yi))
 
+class Frames:
+    def __init__(self):
+        self.frame1 = None
+        self.frame2 = None
+        self.x1 = 0
+        self.y1 = 474
+        self.x2 = 742
+        self.y2 = 474
+        self.player0 = pygame.image.load('images/PlayerFrames/firzen_frame.png')
+        self.player1 = pygame.image.load('images/PlayerFrames/jack_frame.png')
+        self.player2 = pygame.image.load('images/PlayerFrames/jan_frame.png')
+        self.player3 = pygame.image.load('images/PlayerFrames/justin_frame.png')
+        self.player4 = pygame.image.load('images/PlayerFrames/louisEX_frame.png')
+        self.listaFrames = [self.player0, self.player1, self.player2, self.player3, self.player4]
+        self.vidas1 = 3
+        self.vidas2 = 3
+        self.titleFont = pygame.font.Font("freesansbold.ttf", 20)
+        self.PLAYER1 = self.titleFont.render("PLAYER 1", True, (0, 0, 0))
+        self.PLAYER2 = self.titleFont.render("PLAYER 2", True, (0, 0, 0))
+        self.VIDA1 = self.titleFont.render(str(self.vidas1), True, (0, 0, 0))
+        self.VIDA2 = self.titleFont.render(str(self.vidas2), True, (0, 0, 0))
+
+    def drawFrames(self, world):
+        for i in range(len(self.listaFrames)):
+            if i == selectedPlayers[0]:
+                self.frame1 = self.listaFrames[i]
+                break
+
+        for i in range(len(self.listaFrames)):
+            if i == selectedPlayers[1]:
+                self.frame2 = self.listaFrames[i]
+                break
+
+        world.blit(self.frame1, (self.x1, self.y1))
+        world.blit(self.frame2, (self.x2, self.y2))
+
+        world.blit(self.PLAYER1, (self.x1 + 30, self.y1))
+        world.blit(self.PLAYER2, (self.x2 + 30, self.y2))
+
+        world.blit(self.VIDA1, (70, 676))
+        world.blit(self.VIDA2, (810, 676))
+
 def main():
     '''
     Setup
@@ -257,6 +299,8 @@ def main():
 
     plat_list = [plat1, plat2, plat3]
     print(plat_list)
+
+    fs = Frames()
 
     '''
     Main Loop
@@ -423,7 +467,7 @@ def main():
                         print("obtenido: "+power.type)
                         powerup_list.pop(powerup_list.index(power))
                     
-            
+            fs.drawFrames(world) 
             player.update()
             player.draw(world)
 
@@ -438,7 +482,7 @@ def main():
                     
             if power.falling:
                 power.fall(gravity*0.5)
-                    
+                       
             power.update()
             power.draw()
             
