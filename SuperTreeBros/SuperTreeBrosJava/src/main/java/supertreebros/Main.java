@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import supertreebros.comms.MessageReceiver;
 import supertreebros.comms.SendMessage;
+import supertreebros.trees.BstTree;
 
 /**
  *
@@ -13,17 +14,13 @@ import supertreebros.comms.SendMessage;
  */
 public class Main {
     public static void main(String[] args){
-        ServerSocket server = null;
-        try {
-            //MessageReceiver server = new MessageReceiver();
-            server = new ServerSocket(12002);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
+        BstTree bst = new BstTree();
+        bst.append(5);
+        bst.append(7);
+        bst.append(10);
+        bst.append(3);
+        bst.append(2);
         
-        //SendMessage sender = new SendMessage(server);
-        //while(true){
-        //    sender.send("Holaa");
-        //}
+        bst.printTree();
     }
 }
