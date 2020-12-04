@@ -3,6 +3,7 @@ import pygame
 import sys, os, random, socket
 
 selectedPlayers = [-1, -1]
+podium = [None, None, None, None]
 
 '''
 Variables
@@ -1009,6 +1010,7 @@ def ventana_controles():
     AZUL = (0, 26, 51)
     BLANCO = (255, 255, 255)
     NEGRO = (0, 0, 0)
+    GRIS = (111, 111, 111)
     SCREEN_WIDTH = 900
     SCREEN_HEIGHT = 700
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -1022,6 +1024,9 @@ def ventana_controles():
                 running = False
                 pygame.quit()
                 quit()
+
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
 
         titleFont = pygame.font.Font("freesansbold.ttf", 40)
         letrasFont = pygame.font.Font("freesansbold.ttf", 70)
@@ -1088,9 +1093,60 @@ def ventana_controles():
         SHIFTD = titleFont.render("SHIFTD", True, NEGRO)
         screen.blit(SHIFTD, (565, 535))
         screen.blit(power1, (730, 535))
+        
+        #BOTON DE REGRESO
+        if 360 + 200 > mouse[0] > 360 and 620 + 50 > mouse[1] > 620:
+            pygame.draw.rect(screen, GRIS, (360, 620, 200, 50))
+            if click[0] == 1:
+                running = False
+                main_menu()
+
+        else:
+            BR1 = pygame.draw.rect(screen, BLANCO, (360, 620, 200, 50))
+
+        textFont = pygame.font.Font("freesansbold.ttf", 32)
+        text1 = textFont.render("REGRESAR", True, NEGRO)  
+        screen.blit(text1, (370, 630))
 
         pygame.display.update()
-        
+
+
+def ganador_perdedor(podium):
+    pygame.init()
+    
+    SCREEN_WIDTH = 626
+    SCREEN_HEIGHT = 626
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption("GANADOR Y PERDEDOR")
+    
+    GRIS = (211, 211, 211)
+    NEGRO = (0, 0, 0)
+    GOLD = (212, 175, 55)
+    screen.fill(GRIS)
+
+    titleFont = pygame.font.Font("freesansbold.ttf", 30)
+
+    backGround = pygame.image.load("images/background/fondoGanador3.png")
+
+    running = True
+
+    while running: 
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                quit()
+        screen.blit(backGround, (0, 0))
+
+        ganador = titleFont.render(("GANADOR: " + str(podium[2])), True, GOLD)
+        screen.blit(ganador, (155, 250))
+
+        screen.blit(podium[0].images[0], (295, 345))
+            
+        pygame.display.update()
+
+
+   
 
 def ganador_perdedor(podium):
     pygame.init()
