@@ -6,8 +6,8 @@ package supertreebros.trees;
  */
 public class Node {
     private int data;
-    private Node right = null;
-    private Node left = null;
+    private int height;
+    private Node right = null, left = null, parent = null;
     
     public Node(int data){
         this.data = data;
@@ -31,5 +31,17 @@ public class Node {
     
     public int getData(){
         return this.data;
+    }
+    public void setHeight(int h){
+        this.height = h;
+    }
+    public int getHeight(){
+        return this.height;
+    }
+    public Node getParent(){
+        return this.parent;
+    }
+    public void setParent(Node par){
+        this.parent = par;
     }
 }

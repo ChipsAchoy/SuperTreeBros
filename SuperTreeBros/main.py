@@ -1,6 +1,6 @@
 
 import pygame
-import sys, os, random
+import sys, os, random, socket
 
 selectedPlayers = [-1, -1]
 
@@ -8,7 +8,7 @@ selectedPlayers = [-1, -1]
 Variables
 '''
 
-worldx = 900
+worldx = 1200
 worldy = 700
 fps = 40
 world = pygame.display.set_mode([worldx, worldy])
@@ -46,8 +46,13 @@ class Player(object):
         self.images = []
         self.titleFont = pygame.font.Font("freesansbold.ttf", 18)
         self.vida = 3
+        self.challenges = 0
+        self.nodes = 0
         self.VIDA = self.titleFont.render(str(self.vida), True, (0, 0, 0))
-        
+        self.CHL = self.titleFont.render(str(self.challenges), True, (0, 0, 0))
+        self.POWER = self.titleFont.render(str(self.powerUp), True, (0, 0, 0))
+        self.xi = x+15
+        self.yi = y+15
 
         if character == 0:
             self.character = "firzen"
@@ -57,16 +62,16 @@ class Player(object):
             self.power = 10
             self.maxPower = 10
         elif character == 1:
-            self.height = 71
             self.character = "jack"
+            self.height = 71
             self.steps_x = 8
             self.maxJump = 20
             self.power = 11
             self.maxPower = 11
         elif character == 2:
-            self.height = 80
             self.character = "jan"
-            self.steps_x = 17
+            self.height = 80
+            self.steps_x = 13
             self.maxJump = 14
             self.power = 8
             self.maxPower = 8
@@ -80,7 +85,7 @@ class Player(object):
         elif character == 4:
             self.character = "louisEX"
             self.height = 74
-            self.steps_x = 15
+            self.steps_x = 11
             self.maxJump = 13
             self.power = 10
             self.maxPower = 10
@@ -180,13 +185,21 @@ class Player(object):
     def draw(self, surface, current):
         surface.blit(self.image, (self.x, self.y))
         self.VIDA = self.titleFont.render(str(self.vida), True, (0, 0, 0))
+        self.CHL = self.titleFont.render(str(self.challenges), True, (0, 0, 0))
+        if self.powerEnable:
+            self.POWER = self.titleFont.render(str(self.powerUp), True, (0, 0, 0))
+        else:
+            self.POWER = self.titleFont.render(str(self.powerUp), True, (222, 0, 0))
+        
         if current:
             surface.blit(self.VIDA, (75, 676))
+            surface.blit(self.CHL, (75, 696))
+            surface.blit(self.POWER, (75, 716))
         else:
             surface.blit(self.VIDA, (810, 676))
+            surface.blit(self.CHL, (810, 696))
+            surface.blit(self.POWER, (810, 716))
             
-        
-        
 
 class Powerups:
     def __init__(self, screen, stype, xi, yi, image):
@@ -205,6 +218,32 @@ class Powerups:
     def fall(self, grv):
         self.movey += grv
 
+    def update(self):
+        if self.falling:
+            self.y = self.y + self.movey
+    
+    def draw(self):
+        self.screen.blit(self.image, (self.x, self.y))
+        
+
+class Token:
+    def __init__(self, screen, stype, xi, yi, num):
+        self.type = stype
+        self.num = num
+        self.x = xi
+        self.y = yi
+        self.distx = 30
+        self.disty = 30
+        self.screen = screen
+        self.movey = 0
+        self.falling = True
+        self.catch = False
+        self.ticks = 0
+        self.image = pygame.image.load("images/tokens/"+self.type+"/"+self.type+str(self.num)+".png")
+
+    def fall(self, grv):
+        self.movey += grv
+        
     def update(self):
         if self.falling:
             self.y = self.y + self.movey
@@ -268,6 +307,9 @@ def main():
     Setup
     '''
     global selectedPlayers
+
+    world = pygame.display.set_mode([worldx, worldy])
+    
     backdrop = pygame.image.load("images/background/bg.png")
     platImage1 = pygame.image.load("images/Platforms/small_platform.png")
     platImage2 = pygame.image.load("images/Platforms/big_platform.png")
@@ -275,7 +317,6 @@ def main():
     force_image = pygame.image.load("images/powericons/forcepush.png")
     shield_image = pygame.image.load("images/powericons/shield.png")
     jump_image = pygame.image.load("images/powericons/jump.png")
-
     
     clock = pygame.time.Clock()
     pygame.init()
@@ -284,16 +325,31 @@ def main():
     
     gravity = 1
     #steps_x = 10
+    event_types = ["bst", "avl", "spl", "btr"]
+    tokens = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
     player_list = []
     powerup_list = []
+    token_list = []
     powerup_types = ["forcepush","shield","extrajump"]
     powerup_images = [force_image, shield_image, jump_image]
     
     crono = 0
     flag = True
     flag2 = True
+    flag3 = True
+    flag4 = True
+    flag5 = True
+    flag6 = True
     
-    player1 = Player(['w', 'a', 'd', 's','g'], 100, 100,selectedPlayers[0])  # spawn player
+    selectedTree = ""
+    selectedElems = 0
+    currentTree = ["", ""]
+    treesDraw = ["", ""]
+    newNodes = ["", ""]
+    
+    event_tree = False
+    
+    player1 = Player(['w', 'a', 'd', 's','g'], 100, 100, selectedPlayers[0])  # spawn player
     player_list.append(player1)
 
     player2 = Player([pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN, pygame.K_RSHIFT], 750, 100,selectedPlayers[1])  # spawn player
@@ -302,22 +358,37 @@ def main():
     plat1 = Platform(world, 250, 450, 400, 30, platImage2)
     plat2 = Platform(world, 50, 300, 150, 30, platImage1)
     plat3 = Platform(world, 700, 300, 150, 30, platImage1)
-
+    
     plat_list = [plat1, plat2, plat3]
     print(plat_list)
 
+    global podium
+    
     fs = Frames()
 
+    HOST = "localhost"
+    PORT = 12002
+    
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((HOST, PORT))
+
+
+    titleFont = pygame.font.Font("freesansbold.ttf", 40)
+    textFont = pygame.font.Font("freesansbold.ttf", 20)
+    treeFont1 = pygame.font.Font("freesansbold.ttf", 15)
+    treeFont2 = pygame.font.Font("freesansbold.ttf", 10)
+    
     '''
     Main Loop
     '''
 
     ref_crono = (pygame.time.get_ticks()) // 1000
+    ref_event = 0
+    event_crono = 0
     
     while main:
-        
+
         crono = ((pygame.time.get_ticks()) // 1000) - ref_crono
-        
 
         if crono%30 == 0 and crono != 0 and flag:
             positionx = random.randint(50, 850)
@@ -346,11 +417,126 @@ def main():
                         player.power = player.maxPower
             
             flag2 = False
-
             
         elif crono>=30 and crono%2 != 0 and not flag2:
             flag2 = True
-        ###Programar un cronometro para cada objeto#### Esto para que sepa cuando desaparecer
+
+        if crono % 60 == 0 and not event_tree and flag3 and crono != 0:
+            for player in player_list:
+                player.nodes = 0   
+            tokens = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+            event_crono = 0
+            ref_event = crono
+            event_tree = True
+            currentTree = ["", ""]
+            treesDraw = ["player1: ", "player2: "]
+            newNodes = ["", ""]
+            elems = random.randint(3,5)
+            index = random.randint(0,2)
+            selectedTree = event_types[index]
+            selectedElems = elems
+            sock.sendall(bytes("event:"+event_types[index]+":"+str(elems)+":\n", 'utf-8'))
+            data = sock.recv(1024)
+            print (data)
+            flag = False
+            
+        elif crono % 60 != 0 and not event_tree and not flag3:
+            flag3 = True
+            
+        if crono % 5 == 0 and event_tree and flag4:
+            flag4 = False
+            tree = ""
+            prob = random.randint(0,3)
+            
+            if prob <= 1:
+                tree = selectedTree
+            else:
+                index = random.randint(0,3)
+                tree = event_types[index]
+            elem = random.randint(1,15)
+            
+            if tree == selectedTree and len(tokens) > 0:
+                elem = tokens[random.randint(0, len(tokens)-1)]
+                tokens.pop(tokens.index(elem))
+                print(tokens)
+                
+            for tok in token_list:
+                tok.ticks += 1
+                if tok.ticks > 1:
+                    token_list.pop(token_list.index(tok))
+
+            positionx = random.randint(50, 850)
+            token_list.append(Token(world, tree, positionx, 0, elem))
+            
+        elif crono % 5 != 0 and event_tree and not flag4:
+            flag4 = True
+
+        if crono % 3 == 0 and event_tree and flag5:
+            flag5 = False
+            if newNodes[0] != "":
+                if player1.nodes < selectedElems:
+                    currentTree[0] = "player1::"+newNodes[0]+"\n"
+                    sock.sendall(bytes(currentTree[0], 'utf-8'))
+                    data = sock.recv(1024)    
+                    print("1)", data.decode('utf-8'))
+                    treesDraw[0] = data.decode('utf-8')
+                    #if ("1:f" in data.decode('utf-8')):
+                    #    event_tree = False
+                    #    print ("Gano el player 1")
+                    #if ("2:f" in data.decode('utf-8')):
+                    #    event_tree = False
+                    #    print ("Gano el player 2")
+                else:
+                    player1.challenges += 1
+                    if player1.challenges == 3:
+                        podium = [player2, player1, "PLAYER2", "PLAYER1"]
+                        main = False
+                    print("Player 1 won")
+                    event_tree = False
+            newNodes[0] = ""    
+            
+        elif crono % 3 != 0 and event_tree and not flag5:
+            flag5 = True
+
+        if crono % 3 != 0 and event_tree and flag6:
+            flag6 = False
+            if newNodes[1] != "":
+                if player2.nodes < selectedElems:
+                    currentTree[1] = "player2::"+newNodes[1]+"\n"
+                    sock.sendall(bytes(currentTree[1], 'utf-8'))
+                    data = sock.recv(1024)    
+                    print("2)", data.decode('utf-8'))
+                    treesDraw[1] = data.decode('utf-8')
+                    #if ("2:f" in data.decode('utf-8')):
+                    #    event_tree = False
+                    #    print ("Gano el player 2")
+                    #if ("1:f" in data.decode('utf-8')):
+                    #    event_tree = False
+                    #    print ("Gano el player 1")
+                else:
+                    player2.challenges += 1
+                    if player2.challenges == 3:
+                        podium = [player1, player2, "PLAYER1", "PLAYER2"]
+                        main = False
+                    print("Player 2 won")
+                    event_tree = False
+                    
+            newNodes[1] = ""
+            
+        elif crono % 3 == 0 and event_tree and not flag6:
+            flag6 = True
+
+        if event_tree:
+            event_crono = ((pygame.time.get_ticks()) // 1000) - ref_event
+            if event_crono > 90:   #EVALUAR SI SE ACABA EL EVENTOOOOOOO
+                if player1.nodes >= player2.nodes:
+                    print("Gana el player 1")
+                else:
+                    print("Gana el player 2")
+                    
+                event_tree = False
+                print("evento finished")
+                
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -362,9 +548,7 @@ def main():
                     
             for player in player_list:
                 if isinstance(player.controls[0], str):
-
                     if event.type == pygame.KEYDOWN:
-
                         player.moving = True
                         if event.key == ord(player.controls[1]):
                             player.pressed[0] = True
@@ -457,9 +641,17 @@ def main():
                         player.falling = False
                 if player.y >= 700:
                     player.vida -= 1
-                                
-                        
-########################################################################################################################################
+                    player.x = player.xi
+                    player.y = player.yi
+                if player.vida == 0:
+                    if player == player_list[0]:
+                        podium = [player2, player1, "PLAYER2", "PLAYER1"]
+                        main = False
+                        #ganador_perdedor(podium)
+                    else:
+                        podium = [player1, player2, "PLAYER1", "PLAYER2"]
+                        main = False
+                        #ganador_perdedor(podium)
             else:
                 checks = 0
                 for plat in plat_list:
@@ -482,6 +674,35 @@ def main():
                         player.powerUp = power.type
                         print("obtenido: "+power.type)
                         powerup_list.pop(powerup_list.index(power))
+
+            for tok in token_list:
+                if player.x-10 <= tok.x+15 and player.x+100 >= tok.x+15 and player.y <= tok.y+15 and player.y+90 >= tok.y+15:
+                    if tok.type == selectedTree:
+                        if player == player_list[0]:
+                            newNodes[0] += str(tok.num)+","
+                            print(newNodes[0])
+                        else:
+                            newNodes[1] += str(tok.num)+","
+                            print(newNodes[1])
+                        player.nodes += 1
+                        
+                    else:
+                        if player == player_list[0]:
+                            currentTree[0] = "player1:r\n"
+                            sock.sendall(bytes(currentTree[0], 'utf-8'))
+                            data = sock.recv(1024)    
+                            print("reset 1)", data.decode('utf-8'))
+                            treesDraw[0] = "player1:"
+                            
+                        else:
+                            currentTree[1] = "player2:r\n"
+                            sock.sendall(bytes(currentTree[1], 'utf-8'))
+                            data = sock.recv(1024)    
+                            print("reset 2)", data.decode('utf-8'))
+                            treesDraw[1] = "player2:"
+                        player.nodes = 0
+                            
+                    token_list.pop(token_list.index(tok))
                      
             player.update()
             player.draw(world, cord)
@@ -500,11 +721,93 @@ def main():
                        
             power.update()
             power.draw()
+
+        for tok in token_list:
+            for plat in plat_list:
+                if tok.x-10 >= plat.xi and tok.x + 30 <= plat.xi + plat.distx and tok.y+30 >= plat.yi and tok.y+30 <= plat.yi+30:
+                    tok.y = plat.yi - 30
+                    tok.falling = False
+            if tok.y > 700:
+                token_list.pop(token_list.index(tok))
+                    
+            if tok.falling:
+                tok.fall(gravity*0.5)
+                       
+            tok.update()
+            tok.draw()
+        
+        minutes = str(crono//60)
+        seconds = str(crono%60)
+        
+        if crono//60 < 10:
+            minutes = "0"+minutes
+
+        if crono%60 < 10:
+            seconds = "0"+seconds
+
+        if event_tree:
+            mins = str(event_crono//60)
+            secs = str(event_crono%60)
+            tree_text = ""
+            if event_crono//60 < 10:
+                mins = "0"+mins
+
+            if event_crono%60 < 10:
+                secs = "0"+secs
+            if selectedTree == "bst":
+                tree_text = "Bst"
+            elif selectedTree == "avl":
+                tree_text = "AVL"
+            elif selectedTree == "spl":
+                tree_text = "Splay"
+            elif selectedTree == "btr":
+                tree_text = "BTree"
+            #poner los arbooles, cronometro del evento, el evento: armar un arbol x de n elementos
+            event_text = titleFont.render("Evento: Build a "+tree_text+" of "+str(selectedElems)+"  "+mins+":"+secs, True, (170, 0, 0))
+            world.blit(event_text, (150, 80))
+
+            font1 = treeFont1
+            font2 = treeFont1
+            if len(treesDraw[0]) > 60:
+                font1 = treeFont2
+                
+            if len(treesDraw[1]) > 60:
+                font1 = treeFont2
             
+            yi = 10
+            line = ""
+            for w in treesDraw[0]:
+                if w.isdigit()or w == "\\" or w == "/" or w.isalpha() or w == " " or w == ":":
+                    line += w
+                elif w == "\n":
+                    yi += 30
+                    tree1_text = font1.render(line, True, (255, 255, 255))
+                    world.blit(tree1_text, (950, yi))
+                    line = ""
+
+            yi += 30
+            line = ""
+            for w in treesDraw[1]:
+                if w.isdigit() or w == "\\" or w == "/" or w.isalpha() or w == " " or w == ":":
+                    line += w
+                elif w == "\n":
+                    yi += 25
+                    tree2_text = font2.render(line, True, (255, 255, 255))
+                    world.blit(tree2_text, (950, yi))
+                    line = ""
+            
+        
+        crono_text = textFont.render("Time "+minutes+":"+seconds, True, (0, 0, 0))
+        world.blit(crono_text, (50, 30))
         
         pygame.display.flip()
         clock.tick(fps)
-
+    
+    #sock.sendall(bytes("finish", 'utf-8'))
+    #data = sock.recv(1024)
+    sock.close()
+    ganador_perdedor(podium)
+    
 def escoger_jugador():
     #Base de la ventana
     pygame.init()
@@ -789,7 +1092,61 @@ def ventana_controles():
         pygame.display.update()
         
 
+def ganador_perdedor(podium):
+    pygame.init()
+    
+    SCREEN_WIDTH = 626
+    SCREEN_HEIGHT = 626
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption("GANADOR Y PERDEDOR")
+    
+    GRIS = (211, 211, 211)
+    NEGRO = (0, 0, 0)
+    BLANCO = (255, 255, 255)
+    GOLD = (212, 175, 55)
+    screen.fill(GRIS)
+
+    titleFont = pygame.font.Font("freesansbold.ttf", 30)
+
+    backGround = pygame.image.load("images/background/fondoGanador3.png")
+
+    running = True
+
+    while running: 
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                quit()
+        screen.blit(backGround, (0, 0))
+
+        ganador = titleFont.render(("GANADOR: " + str(podium[2])), True, GOLD)
+        screen.blit(ganador, (155, 250))
+
+        screen.blit(podium[0].images[0], (295, 345))
+
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        #BOTON DE REGRESO
+        if 220 + 200 > mouse[0] > 220 and 570 + 50 > mouse[1] > 570:
+            pygame.draw.rect(screen, GRIS, (220, 570, 200, 50))
+            if click[0] == 1:
+                running = False
+                main_menu()
+        else:
+            pygame.draw.rect(screen, BLANCO, (220, 570, 200, 50))
+
+        textFont = pygame.font.Font("freesansbold.ttf", 32)
+        text1 = textFont.render("REGRESAR", True, NEGRO)  
+        screen.blit(text1, (230, 580))
+            
+        pygame.display.update()
+
+
 def main_menu():
+    global selectedPlayers
+    selectedPlayers = [-1,-1]
     BLANCO = (255, 255, 255)
     NEGRO = (0, 0, 0)
     GRIS = (211, 211, 211)
@@ -799,7 +1156,7 @@ def main_menu():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Super Tree bros")
     # BackGround = pygame.image.load('')
-
+    
     running = True
     # screen.blit(BackGround, (0, 0))
 

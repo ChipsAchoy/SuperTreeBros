@@ -20,12 +20,5 @@ public class JavaServer {
         Socket client = server.accept();
         MessageReceiver listener  = new MessageReceiver(client);
         //SendMessage sender = new SendMessage(client);
-        boolean run = true;
-        while(run) {
-            
-            //System.out.println("got connection on port 12002");
-            
-            
-        }
     }
 }
