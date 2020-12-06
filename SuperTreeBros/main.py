@@ -1,6 +1,6 @@
 
 import pygame
-import sys, os, random, socket
+import sys, os, random, socket, time
 
 selectedPlayers = [-1, -1]
 podium = [None, None, None, None]
@@ -11,7 +11,7 @@ worldx = 1200
 worldy = 700
 fps = 40
 world = pygame.display.set_mode([worldx, worldy])
-connected = False
+connected = True
 
 
 
@@ -40,7 +40,7 @@ class Player(object):
         self.ticks = 0
         self.powerEnable = False
         self.images = []
-        self.titleFont = pygame.font.Font("freesansbold.ttf", 18)
+        self.titleFont = pygame.font.Font("freesansbold.ttf", 16)
         self.vida = 3
         self.challenges = 0
         self.nodes = 0
@@ -187,11 +187,11 @@ class Player(object):
         if current:
             surface.blit(self.VIDA, (75, 676))
             surface.blit(self.CHL, (110, 636))
-            surface.blit(self.POWER, (80, 656))
+            surface.blit(self.POWER, (70, 656))
         else:
             surface.blit(self.VIDA, (810, 676))
             surface.blit(self.CHL, (845, 636))
-            surface.blit(self.POWER, (805, 656))
+            surface.blit(self.POWER, (810, 656))
             
 
 class Powerups:
@@ -1002,9 +1002,57 @@ def escoger_jugador():
         screen.blit(FIJAR, (590, 585))
 
         if selectedPlayers[0] != -1 and selectedPlayers[1] != -1:
-            main()
+            running = False
+            pantalla_carga()
+            #main()
 
         pygame.display.update()
+
+def pantalla_carga():
+    pygame.init()
+    SCREEN_WIDTH = 900
+    SCREEN_HEIGHT = 500
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption("PANTALLA DE CARGA")
+    token1 = pygame.image.load("images/tokens/avl/avl1.png")
+    token2 = pygame.image.load("images/tokens/bst/bst1.png")
+    token3 = pygame.image.load("images/tokens/btr/btr1.png")
+    token4 = pygame.image.load("images/tokens/spl/spl1.png")
+    AZUL = (0, 26, 51)
+    BLANCO = (255, 255, 255)
+    NEGRO = (0, 0, 0)
+    GRIS = (111, 111, 111)
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                quit()
+
+        titleFont = pygame.font.Font("freesansbold.ttf", 38)
+        titleFont2 = pygame.font.Font("freesansbold.ttf", 34)
+        cargando = titleFont.render("CARGANDO PARTIDA . . .", True, BLANCO)
+        regla1 = titleFont.render("GANA EL QUE CONSIGA 3 CHALLENGES,", True, BLANCO)
+        regla2 = titleFont2.render("COMPLETANDO LOS ARBOLES CORRECTAMENTE", True, BLANCO)
+        regla3 = titleFont2.render("EL PRIMERO EN MORIR 3 VECES PIERDE EL JUEGO", True, BLANCO)
+        screen.blit(cargando, (200, 50))
+        screen.blit(regla1, (60, 140))
+        screen.blit(regla2, (20, 200))
+        screen.blit(regla3, (20, 350))
+
+        screen.blit(token1, (350, 270))
+        screen.blit(token2, (400, 270))
+        screen.blit(token3, (450, 270))
+        screen.blit(token4, (500, 270))
+        
+
+        
+        pygame.display.update()
+        time.sleep(6)
+        main()
+    
 
 
 def ventana_controles():
@@ -1208,17 +1256,21 @@ def main_menu():
     BLANCO = (255, 255, 255)
     NEGRO = (0, 0, 0)
     GRIS = (211, 211, 211)
+    COLOR = (7, 29, 66)
     pygame.init()
-    SCREEN_WIDTH = 900
-    SCREEN_HEIGHT = 700
+    SCREEN_WIDTH = 500
+    SCREEN_HEIGHT = 500
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Super Tree bros")
-    # BackGround = pygame.image.load('')
+    BackGround = pygame.image.load("images/background/title.png")
+    personaje1 = pygame.image.load("images/Sprites/firzen/firzen_stand.png")
+    personaje2 = pygame.image.load("images/Sprites/louisEX/louisEX_jump.png")
+
     
     running = True
-    # screen.blit(BackGround, (0, 0))
 
-    while running:  # iteration for space of the button
+
+    while running:  
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -1228,55 +1280,52 @@ def main_menu():
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
-        if 350 + 200 > mouse[0] > 350 and 150 + 50 > mouse[1] > 150:
-            pygame.draw.rect(screen, GRIS, (350, 150, 200, 50))
+        screen.fill(COLOR)
+
+    
+        if 180 + 170 > mouse[0] > 180 and 265 + 32 > mouse[1] > 265:
+            pygame.draw.rect(screen, GRIS, (180, 265, 170, 34))
             if click[0] == 1:
                 running = False
                 escoger_jugador()
 
         else:
-            BR1 = pygame.draw.rect(screen, BLANCO, (350, 150, 200, 50))
+            BR1 = pygame.draw.rect(screen, BLANCO, (180, 265, 170, 34))
 
-        if 350 + 200 > mouse[0] > 350 and 250 + 50 > mouse[1] > 250:
-            pygame.draw.rect(screen, GRIS, (350, 250, 200, 50))
-            if click[0] == 1:
-                running = False
-                main()
 
-        else:
-            BR2 = pygame.draw.rect(screen, BLANCO, (350, 250, 200, 50))
-
-        if 350 + 200 > mouse[0] > 350 and 350 + 50 > mouse[1] > 350:
-            pygame.draw.rect(screen, GRIS, (350, 350, 200, 50))
-            if click[0] == 1:
-                running = False
-                main()
-
-        else:
-            BR3 = pygame.draw.rect(screen, BLANCO, (350, 350, 200, 50))
-
-        if 350 + 200 > mouse[0] > 350 and 450 + 50 > mouse[1] > 450:
-            pygame.draw.rect(screen, GRIS, (350, 450, 200, 50))
+        if 180 + 170 > mouse[0] > 180 and 330 + 32 > mouse[1] > 330:
+            pygame.draw.rect(screen, GRIS, (180, 330, 170, 32))
             if click[0] == 1:
                 running = False
                 ventana_controles()
 
         else:
-            BR4 = pygame.draw.rect(screen, BLANCO, (350, 450, 200, 50))
+            BR2 = pygame.draw.rect(screen, BLANCO, (180, 330, 170, 32))
+            
+
+        if 180 + 170 > mouse[0] > 180 and 400 + 32 > mouse[1] > 400:
+            pygame.draw.rect(screen, GRIS, (180, 400, 170, 32))
+            if click[0] == 1:
+                running = False
+                pygame.quit()
+                quit()
+
+        else:
+            BR2 = pygame.draw.rect(screen, BLANCO, (180, 400, 170, 32))
 
         titleFont = pygame.font.Font("freesansbold.ttf", 60)
-        gameTitle = titleFont.render("SUPER TREE BROS", True, NEGRO)
-        screen.blit(gameTitle, (150, 50))
-        textFont = pygame.font.Font("freesansbold.ttf", 28)  # font
+        screen.blit(BackGround, (130, 80))
+        screen.blit(personaje1, (50, 300))
+        screen.blit(personaje2, (400, 300))
+        textFont = pygame.font.Font("freesansbold.ttf", 24)  # font
         text1 = textFont.render("2 JUGADORES", True, NEGRO)  # new game text
-        screen.blit(text1, (350, 165))
-        text2 = textFont.render("3 JUGADORES", True, NEGRO)  # load text
-        screen.blit(text2, (350, 265))
-        text3 = textFont.render("4 JUGADORES", True, NEGRO)  # Instructions text
-        screen.blit(text3, (350, 365))
-        text4 = textFont.render("CONTROLES", True, NEGRO)  # Credits text
-        screen.blit(text4, (350, 465))
+        screen.blit(text1, (180, 270))
+        text2 = textFont.render("CONTROLES", True, NEGRO)  # Credits text
+        screen.blit(text2, (188, 334))
+        text3 = textFont.render("EXIT", True, NEGRO)  # Credits text
+        screen.blit(text3, (235, 406))
 
+        
         pygame.display.update()
 
 main_menu()
