@@ -33,14 +33,13 @@ public class MessageReceiver implements Runnable{
                     eventhandler = EventHandler.getInstace(this.message.substring(6, 9), Integer.parseInt(this.message.substring(10, 11)));
                     System.out.println("Nuevo evento");
                     sender.send("Confirmed");
-                }else{
-                    if (this.message.substring(0, 6).equals("finish"))
-                        this.serverup = false;
+                }else{  
                     eventhandler.parseNodes(this.message);
                     sender.send(eventhandler.getCurrentTree());
                 }
                 
             }catch(Exception e){
+                this.serverup = false;
                 System.out.println(e.getMessage());
             }
         }

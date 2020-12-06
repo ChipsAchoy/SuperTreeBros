@@ -4,20 +4,15 @@ import sys, os, random, socket
 
 selectedPlayers = [-1, -1]
 podium = [None, None, None, None]
+sock = None
 
-'''
-Variables
-'''
 
 worldx = 1200
 worldy = 700
 fps = 40
 world = pygame.display.set_mode([worldx, worldy])
+connected = False
 
-
-'''
-Objects
-'''
 
 
 class Player(object):
@@ -114,9 +109,6 @@ class Player(object):
         self.movey += grv
     
     def update(self):
-        """
-        Update sprite position
-        """
 
         self.x = self.x + self.movex
         self.y = self.y + self.movey
@@ -187,19 +179,19 @@ class Player(object):
         surface.blit(self.image, (self.x, self.y))
         self.VIDA = self.titleFont.render(str(self.vida), True, (0, 0, 0))
         self.CHL = self.titleFont.render(str(self.challenges), True, (0, 0, 0))
-        if self.powerEnable:
+        if not self.powerEnable:
             self.POWER = self.titleFont.render(str(self.powerUp), True, (0, 0, 0))
         else:
             self.POWER = self.titleFont.render(str(self.powerUp), True, (222, 0, 0))
         
         if current:
             surface.blit(self.VIDA, (75, 676))
-            surface.blit(self.CHL, (75, 696))
-            surface.blit(self.POWER, (75, 716))
+            surface.blit(self.CHL, (110, 636))
+            surface.blit(self.POWER, (80, 656))
         else:
             surface.blit(self.VIDA, (810, 676))
-            surface.blit(self.CHL, (810, 696))
-            surface.blit(self.POWER, (810, 716))
+            surface.blit(self.CHL, (845, 636))
+            surface.blit(self.POWER, (805, 656))
             
 
 class Powerups:
@@ -307,7 +299,7 @@ def main():
     '''
     Setup
     '''
-    global selectedPlayers
+    global selectedPlayers, podium, connected, sock
 
     world = pygame.display.set_mode([worldx, worldy])
     
@@ -363,15 +355,16 @@ def main():
     plat_list = [plat1, plat2, plat3]
     print(plat_list)
 
-    global podium
     
     fs = Frames()
-
-    HOST = "localhost"
-    PORT = 12002
     
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((HOST, PORT))
+    if not connected:
+        HOST = "localhost"
+        PORT = 12002
+        
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((HOST, PORT))
+        connected = True
 
 
     titleFont = pygame.font.Font("freesansbold.ttf", 40)
@@ -379,9 +372,6 @@ def main():
     treeFont1 = pygame.font.Font("freesansbold.ttf", 15)
     treeFont2 = pygame.font.Font("freesansbold.ttf", 10)
     
-    '''
-    Main Loop
-    '''
 
     ref_crono = (pygame.time.get_ticks()) // 1000
     ref_event = 0
@@ -531,8 +521,20 @@ def main():
             event_crono = ((pygame.time.get_ticks()) // 1000) - ref_event
             if event_crono > 90:   #EVALUAR SI SE ACABA EL EVENTOOOOOOO
                 if player1.nodes >= player2.nodes:
+                    player1.challenges += 1
+                    if player1.challenges == 3:
+                        podium = [player2, player1, "PLAYER2", "PLAYER1"]
+                        main = False
+                    print("Player 1 won")
+                    event_tree = False
                     print("Gana el player 1")
                 else:
+                    player2.challenges += 1
+                    if player2.challenges == 3:
+                        podium = [player1, player2, "PLAYER1", "PLAYER2"]
+                        main = False
+                    print("Player 2 won")
+                    event_tree = False
                     print("Gana el player 2")
                     
                 event_tree = False
@@ -806,7 +808,7 @@ def main():
     
     #sock.sendall(bytes("finish", 'utf-8'))
     #data = sock.recv(1024)
-    sock.close()
+    #sock.close()
     ganador_perdedor(podium)
     
 def escoger_jugador():
