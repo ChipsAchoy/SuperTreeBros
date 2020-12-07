@@ -276,7 +276,9 @@ class Frames:
         self.PLAYER1 = self.titleFont.render("PLAYER 1", True, (0, 0, 0))
         self.PLAYER2 = self.titleFont.render("PLAYER 2", True, (0, 0, 0))
         
-
+    #ENTRADAS: wolrd(la localizacion del mapa)
+    #SALIDAS: en la pantalla se pega el jugador 1 y jugador 2
+    #RESTRICCIONES: No hay
     def drawFrames(self, world):
         for i in range(len(self.listaFrames)):
             if i == selectedPlayers[0]:
@@ -939,11 +941,11 @@ def escoger_jugador():
 
         #SELECCION DEL PEROSNAJE 2
 
-        personaje5 = 525 + 120 > mouse[0] > 525 and 150 + 120 > mouse[1] > 150 and click[0] == 1 #(525, 150, 120, 120)
-        personaje6 = 675 + 120 > mouse[0] > 675 and 150 + 120 > mouse[1] > 150 and click[0] == 1 #(675, 150, 120, 120)
-        personaje7 = 525 + 120 > mouse[0] > 525 and 300 + 120 > mouse[1] > 300 and click[0] == 1 #(525, 300, 120, 120)
-        personaje8 = 675 + 120 > mouse[0] > 675 and 300 + 120 > mouse[1] > 300 and click[0] == 1 #(675, 300, 120, 120)
-        personaje9 = 600 + 120 > mouse[0] > 600 and 450 + 120 > mouse[1] > 450 and click[0] == 1 #(600, 450, 120, 120)
+        personaje5 = 525 + 120 > mouse[0] > 525 and 150 + 120 > mouse[1] > 150 and click[0] == 1 
+        personaje6 = 675 + 120 > mouse[0] > 675 and 150 + 120 > mouse[1] > 150 and click[0] == 1 
+        personaje7 = 525 + 120 > mouse[0] > 525 and 300 + 120 > mouse[1] > 300 and click[0] == 1 
+        personaje8 = 675 + 120 > mouse[0] > 675 and 300 + 120 > mouse[1] > 300 and click[0] == 1 
+        personaje9 = 600 + 120 > mouse[0] > 600 and 450 + 120 > mouse[1] > 450 and click[0] == 1 
 
         listaPersonajes2 = [personaje5, personaje6, personaje7, personaje8, personaje9]
 
@@ -1010,19 +1012,30 @@ def escoger_jugador():
 
 def pantalla_carga():
     pygame.init()
+
+    #Especificaciones de la ventana
     SCREEN_WIDTH = 900
     SCREEN_HEIGHT = 500
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("PANTALLA DE CARGA")
-    token1 = pygame.image.load("images/tokens/avl/avl1.png")
-    token2 = pygame.image.load("images/tokens/bst/bst1.png")
-    token3 = pygame.image.load("images/tokens/btr/btr1.png")
-    token4 = pygame.image.load("images/tokens/spl/spl1.png")
+
+    #Colores que se van a utilizar
     AZUL = (0, 26, 51)
     BLANCO = (255, 255, 255)
     NEGRO = (0, 0, 0)
     GRIS = (111, 111, 111)
 
+    #Se cargan las imagenes que se van a utilizar
+    token1 = pygame.image.load("images/tokens/avl/avl1.png")
+    token2 = pygame.image.load("images/tokens/bst/bst1.png")
+    token3 = pygame.image.load("images/tokens/btr/btr1.png")
+    token4 = pygame.image.load("images/tokens/spl/spl1.png")
+
+    #Fuentes que se utilizan para los textos
+    titleFont = pygame.font.Font("freesansbold.ttf", 38)
+    titleFont2 = pygame.font.Font("freesansbold.ttf", 34)
+    
+    #Bucle en donde se muestra todo lo que va en la ventana
     running = True
     while running:
         for event in pygame.event.get():
@@ -1031,8 +1044,7 @@ def pantalla_carga():
                 pygame.quit()
                 quit()
 
-        titleFont = pygame.font.Font("freesansbold.ttf", 38)
-        titleFont2 = pygame.font.Font("freesansbold.ttf", 34)
+        
         cargando = titleFont.render("CARGANDO PARTIDA . . .", True, BLANCO)
         regla1 = titleFont.render("GANA EL QUE CONSIGA 3 CHALLENGES,", True, BLANCO)
         regla2 = titleFont2.render("COMPLETANDO LOS ARBOLES CORRECTAMENTE", True, BLANCO)
@@ -1047,8 +1059,6 @@ def pantalla_carga():
         screen.blit(token3, (450, 270))
         screen.blit(token4, (500, 270))
         
-
-        
         pygame.display.update()
         time.sleep(6)
         main()
@@ -1057,16 +1067,27 @@ def pantalla_carga():
 
 def ventana_controles():
     pygame.init()
+
+    #Colores que se van a utilizar
     AZUL = (0, 26, 51)
     BLANCO = (255, 255, 255)
     NEGRO = (0, 0, 0)
     GRIS = (111, 111, 111)
+
+    #Especificaciones de la ventana
     SCREEN_WIDTH = 900
     SCREEN_HEIGHT = 700
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.fill(AZUL)
     pygame.display.set_caption("CONTROLES")
 
+    #Fuentes que se utilizan para los textos
+    titleFont = pygame.font.Font("freesansbold.ttf", 40)
+    letrasFont = pygame.font.Font("freesansbold.ttf", 70)
+    player1 = titleFont.render("PLAYER 1 CONTROLS:", True, BLANCO)
+    player2 = titleFont.render("PLAYER 2 CONTROLS:", True, BLANCO)
+
+    #Bucle en donde se muestra todo lo que va en la ventana
     running = True
     while running:
         for event in pygame.event.get():
@@ -1078,10 +1099,6 @@ def ventana_controles():
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
-        titleFont = pygame.font.Font("freesansbold.ttf", 40)
-        letrasFont = pygame.font.Font("freesansbold.ttf", 70)
-        player1 = titleFont.render("PLAYER 1 CONTROLS:", True, BLANCO)
-        player2 = titleFont.render("PLAYER 2 CONTROLS:", True, BLANCO)
         screen.blit(player1, (20, 20))
         screen.blit(player2, (20, 340))
 
@@ -1159,65 +1176,32 @@ def ventana_controles():
         screen.blit(text1, (370, 630))
 
         pygame.display.update()
+        
 
-
+ 
+#ENTRADAS: se ingresa la variale "podium" la cual contiene el ganador de la partida
+#SALIDAS: despliega una ventana en donde se muestra la imagen y el nombre del ganador
+#RESTRICCIONES: esta pantalla solo saldra hasta que algun jugador haya ganado
 def ganador_perdedor(podium):
     pygame.init()
-    
+
+    #Especificaciones de la ventana 
     SCREEN_WIDTH = 626
     SCREEN_HEIGHT = 626
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("GANADOR Y PERDEDOR")
-    
-    GRIS = (211, 211, 211)
-    NEGRO = (0, 0, 0)
-    GOLD = (212, 175, 55)
-    screen.fill(GRIS)
-
     titleFont = pygame.font.Font("freesansbold.ttf", 30)
-
     backGround = pygame.image.load("images/background/fondoGanador3.png")
 
-    running = True
-
-    while running: 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                pygame.quit()
-                quit()
-        screen.blit(backGround, (0, 0))
-
-        ganador = titleFont.render(("GANADOR: " + str(podium[2])), True, GOLD)
-        screen.blit(ganador, (155, 250))
-
-        screen.blit(podium[0].images[0], (295, 345))
-            
-        pygame.display.update()
-
-
-   
-
-def ganador_perdedor(podium):
-    pygame.init()
-    
-    SCREEN_WIDTH = 626
-    SCREEN_HEIGHT = 626
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("GANADOR Y PERDEDOR")
-    
+    #Colores que se van a utilizar
     GRIS = (211, 211, 211)
     NEGRO = (0, 0, 0)
     BLANCO = (255, 255, 255)
     GOLD = (212, 175, 55)
     screen.fill(GRIS)
 
-    titleFont = pygame.font.Font("freesansbold.ttf", 30)
-
-    backGround = pygame.image.load("images/background/fondoGanador3.png")
-
+    #Bucle en donde se muestra todo lo que va en la ventana
     running = True
-
     while running: 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1234,7 +1218,7 @@ def ganador_perdedor(podium):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
-        #BOTON DE REGRESO
+        #Boton para regresar al menu principal
         if 220 + 200 > mouse[0] > 220 and 570 + 50 > mouse[1] > 570:
             pygame.draw.rect(screen, GRIS, (220, 570, 200, 50))
             if click[0] == 1:
@@ -1249,27 +1233,33 @@ def ganador_perdedor(podium):
             
         pygame.display.update()
 
-
+#ENTRADAS: No hay
+#SALIDAS: El menu de inicio en donde se puede empezar a jugar o ver los controles
+#RESTRICCIONES: No hay
 def main_menu():
     global selectedPlayers
     selectedPlayers = [-1,-1]
+
+    #Colores que se van a utilizar
     BLANCO = (255, 255, 255)
     NEGRO = (0, 0, 0)
     GRIS = (211, 211, 211)
     COLOR = (7, 29, 66)
+
+    #Especificaciones de la ventana 
     pygame.init()
     SCREEN_WIDTH = 500
     SCREEN_HEIGHT = 500
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Super Tree bros")
+
+    #Se cargan las imagenes que se van a utilizar
     BackGround = pygame.image.load("images/background/title.png")
     personaje1 = pygame.image.load("images/Sprites/firzen/firzen_stand.png")
     personaje2 = pygame.image.load("images/Sprites/louisEX/louisEX_jump.png")
 
-    
+    #Bucle en donde se muestra todo lo que va en la ventana
     running = True
-
-
     while running:  
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1277,12 +1267,11 @@ def main_menu():
                 pygame.quit()
                 quit()
 
+        screen.fill(COLOR)
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
-        screen.fill(COLOR)
-
-    
+        #Se definen los parametros de los botones y las acciones de cada uno
         if 180 + 170 > mouse[0] > 180 and 265 + 32 > mouse[1] > 265:
             pygame.draw.rect(screen, GRIS, (180, 265, 170, 34))
             if click[0] == 1:
@@ -1317,12 +1306,12 @@ def main_menu():
         screen.blit(BackGround, (130, 80))
         screen.blit(personaje1, (50, 300))
         screen.blit(personaje2, (400, 300))
-        textFont = pygame.font.Font("freesansbold.ttf", 24)  # font
-        text1 = textFont.render("2 JUGADORES", True, NEGRO)  # new game text
+        textFont = pygame.font.Font("freesansbold.ttf", 24)  
+        text1 = textFont.render("2 JUGADORES", True, NEGRO)  
         screen.blit(text1, (180, 270))
-        text2 = textFont.render("CONTROLES", True, NEGRO)  # Credits text
+        text2 = textFont.render("CONTROLES", True, NEGRO)  
         screen.blit(text2, (188, 334))
-        text3 = textFont.render("EXIT", True, NEGRO)  # Credits text
+        text3 = textFont.render("EXIT", True, NEGRO) 
         screen.blit(text3, (235, 406))
 
         
