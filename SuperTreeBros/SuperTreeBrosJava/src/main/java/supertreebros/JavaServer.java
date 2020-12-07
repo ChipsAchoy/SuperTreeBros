@@ -1,15 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package supertreebros;
 
 import java.io.*;
 import java.net.*;
 import supertreebros.comms.MessageReceiver;
 import supertreebros.comms.SendMessage;
- 
+/**
+ * Clase main del server de Java
+ * @author Anthony Chaves
+ */ 
 public class JavaServer {
     public static void main(String args[]) throws Exception {
         

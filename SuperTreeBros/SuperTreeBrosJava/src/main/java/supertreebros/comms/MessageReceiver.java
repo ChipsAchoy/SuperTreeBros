@@ -5,7 +5,7 @@ import java.net.*;
 import supertreebros.EventHandler;
 
 /**
- *
+ * Clase que recibe mensajes por medio de sockets
  * @author Anthony Chaves
  */
 public class MessageReceiver implements Runnable{
@@ -18,10 +18,15 @@ public class MessageReceiver implements Runnable{
         Thread th = new Thread(this);
         th.start();
     }
-    
+    /**
+     * Override del método run, el cual funciona en un hilo que escucha la comunicación por sockets
+     */
     @Override
     public void run() {
         SendMessage sender = new SendMessage(this.cliente);
+        /**
+         * Ciclo del servidor
+         */
         while (this.serverup) {
 
             try{

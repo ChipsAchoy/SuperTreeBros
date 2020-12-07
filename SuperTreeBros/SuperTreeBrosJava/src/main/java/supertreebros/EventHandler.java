@@ -6,7 +6,7 @@ import supertreebros.trees.BstTree;
 import supertreebros.trees.SplayTree;
 
 /**
- *
+ * Clase encargada de manejar los eventos, crear árboles, nodos entre otros
  * @author Anthony Chaves
  */
 public class EventHandler {
@@ -21,12 +21,23 @@ public class EventHandler {
     public BTree<Integer, Integer> p1BTree, p2BTree;
     private static EventHandler instance = null;
     
+    /**
+     * Concstructor de la clase event handler
+     * @param type tipo de arbol que sera manejado
+     * @param elems cantidad de elementos
+     */
     private EventHandler(String type, int elems){
         this.elems = elems;
         this.type = type;
         this.defineType(); 
     }
     
+    /**
+     * Método estatico para obtener la instancia
+     * @param type tipo de arbol que sera manejado
+     * @param elems  cantidad de elementos del arbol
+     * @return instacia de la clase
+     */
     public static EventHandler getInstace(String type, int elems){
         if (instance == null){
             instance = new EventHandler(type, elems);
@@ -44,10 +55,16 @@ public class EventHandler {
         return instance;
     }
     
+    /**
+     * Método estatico para obtener la instancia
+     * @return la instancia de la clase (incluso si es null)
+     */
     public static EventHandler getInstance(){
         return instance;
     }
-    
+    /**
+     * Define el tipo de árbol y declara uno para cada jugador
+     */
     public void defineType(){
         if (this.type.equals("bst")){
             this.p1BstTree = new BstTree();
@@ -65,7 +82,10 @@ public class EventHandler {
             System.out.println("No se recibio un arbol correcto");
         }
     }
-    
+    /**
+     * Parsea el string entrante y obtiene los nuevos nodos
+     * @param added String recibido por los sockets
+     */
     public void parseNodes(String added){
         System.out.println(this.type);
         this.current = false;
@@ -123,7 +143,10 @@ public class EventHandler {
             }
         }
     }
-    
+    /**
+     * Obtiene el string que representa el árbol actual y lo devuelve
+     * @return representación del árbol en caracteres
+     */
     public String getCurrentTree(){
         String output1 = "", output2 = "";
         if (this.current && this.level1 < this.elems){

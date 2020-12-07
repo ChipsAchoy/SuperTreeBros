@@ -11,15 +11,64 @@ worldx = 1200
 worldy = 700
 fps = 40
 world = pygame.display.set_mode([worldx, worldy])
-connected = True
+connected = False
 
 
+'''
+clase Player()
+    Atributos: controls:List, pressed:boolean, moving:boolean, isJump:boolean, falling:boolean, jumpCount:int,
+    colide:boolean, x:int, y:int, movex:int, movey:int, frame:int, extraJumps:int, shield:boolean, ticks:int
+    powerEnable:boolean, images:List, titleFont:pygameObject, vida:int, challenges:int, nodes:int, xi:int, yi:int
 
+    Metodos:
+    -control-
+    ENTRADAS: x
+    SALIDAS: actualiza el movimiento en x del personaje
+    RESTRICCIONES:-
+
+    -fall-
+    ENTRADAS: grv
+    SALIDAS: actualiza el movimiento en y del personaje
+    RESTRICCIONES:-
+
+    -update-
+    ENTRADAS:-
+    SALIDAS: Mueve al personaje segun los datos recolectados
+    RESTRICCIONES:-
+
+    -jump-
+    ENTRADAS: grv
+    SALIDAS: Hace que el personaje salte, actualizando la cantidad de tiempo que pasa en el aire
+    RESTRICCIONES:-
+
+    -performPower-
+    ENTRADAS:-
+    SALIDAS: Activa el poder recolectado
+    RESTRICCIONES:-
+
+    -pushed-
+    ENTRADAS:pushed
+    SALIDAS: Empuja al personaje segun la fuerza del otro personaje
+    RESTRICCIONES:-
+
+    -down-
+    ENTRADAS:-
+    SALIDAS: Actualiza la imagen del personaje a la de "agacharse" al presionar la tecla inferior (segun controles)
+    RESTRICCIONES:-
+
+    -checkTime-
+    ENTRADAS:-
+    SALIDAS: Revisa el tiempo restante de los powerups
+    RESTRICCIONES:-
+
+    -draw-
+    ENTRADAS: surface, current
+    SALIDAS: Dibuja los cambios en la posicion, sprites, texto de powerups, vidas y challenges
+    RESTRICCIONES:-
+    
+'''
 class Player(object):
-    """
-    Spawn a player
-    """
-
+    
     def __init__(self, controls, x, y, character):
         pygame.sprite.Sprite.__init__(self)
         self.controls = controls
@@ -100,9 +149,6 @@ class Player(object):
         
 
     def control(self, x):
-        """
-        control player movement
-        """
         self.movex += x
 
     def fall(self, grv):
@@ -193,7 +239,28 @@ class Player(object):
             surface.blit(self.CHL, (845, 636))
             surface.blit(self.POWER, (810, 656))
             
+'''
+clase Powerups
+    Atributos: type:String, x:int, y:int, distx:int, disty:int, screen:pygameObject, movey:int, falling:boolean, catch:boolean
+    ticks:int, image:pygameObject
 
+    Metodos:
+    -fall-
+    ENTRADAS: grv
+    SALIDAS: Mueve el powerup sobre el eje y segun la gravedad
+    RESTRICCIONES:-
+
+    -update-
+    ENTRADAS:-
+    SALIDAS: Actualiza la posicion del powerup
+    RESTRICCIONES:-
+
+    -draw-
+    ENTRADAS:-
+    SALIDAS: Dibuja el powerup segun los cambios realizados
+    RESTRICCIONES:-
+    
+'''
 class Powerups:
     def __init__(self, screen, stype, xi, yi, image):
         self.type = stype
@@ -218,7 +285,28 @@ class Powerups:
     def draw(self):
         self.screen.blit(self.image, (self.x, self.y))
         
+'''
+clase Token
+    Atributos: type:String, num:int, x:int, y:int, distx:int, disty:int ,screen:pygameObject, movey:int, falling:boolean
+    catch:boolean, ticks:int, image:pygameObject
 
+    Metodos:
+    -fall-
+    ENTRADAS: grv
+    SALIDAS: Mueve el token sobre el eje y segun la gravedad
+    RESTRICCIONES:-
+
+    -update-
+    ENTRADAS:-
+    SALIDAS: Actualiza la posicion del token
+    RESTRICCIONES:-
+
+    -draw-
+    ENTRADAS:-
+    SALIDAS: Dibuja el token segun los cambios realizados
+    RESTRICCIONES:-
+    
+'''
 class Token:
     def __init__(self, screen, stype, xi, yi, num):
         self.type = stype
@@ -244,7 +332,17 @@ class Token:
     def draw(self):
         self.screen.blit(self.image, (self.x, self.y))
 
+'''
+clase Platform
+    Atributos: xi:int, yi:int, distx:int, disty:int, screen:pygameObject, ticks:int, image:pygameObject
 
+    Metodos:
+    -draw-
+    ENTRADAS:-
+    SALIDAS: Dibuja las plataformas en el escenario
+    RESTRICCIONES:-
+    
+'''
 class Platform:
     def __init__(self, screen, xi, yi, distx, disty, image):
         self.xi = xi
@@ -258,6 +356,18 @@ class Platform:
     def draw(self):
         self.screen.blit(self.image, (self.xi, self.yi))
 
+'''
+clase Frames
+    Atributos: frame1:pygameObject, frame2:pygameObject, x1:int, y1:int, x2:int, y2:int,
+    player0:pygameObject, player1:pygameObject, player2:pygameObject, player3:pygameObject, player4:pygameObject,
+    listaFrames:List, titleFont:pygameObject
+
+    Metodos:
+    -drawFrames-
+    ENTRADAS: world(la localizacion del mapa)
+    SALIDAS: en la pantalla se dibuja el frame del jugador 1 y jugador 2
+    RESTRICCIONES: -
+'''
 class Frames:
     def __init__(self):
         self.frame1 = None
@@ -276,9 +386,7 @@ class Frames:
         self.PLAYER1 = self.titleFont.render("PLAYER 1", True, (0, 0, 0))
         self.PLAYER2 = self.titleFont.render("PLAYER 2", True, (0, 0, 0))
         
-    #ENTRADAS: wolrd(la localizacion del mapa)
-    #SALIDAS: en la pantalla se pega el jugador 1 y jugador 2
-    #RESTRICCIONES: No hay
+    
     def drawFrames(self, world):
         for i in range(len(self.listaFrames)):
             if i == selectedPlayers[0]:
@@ -296,11 +404,10 @@ class Frames:
         world.blit(self.PLAYER1, (self.x1 + 30, self.y1))
         world.blit(self.PLAYER2, (self.x2 + 30, self.y2))
                
-
+#Pantalla de main
+#En esta pantalla se desarrolla el juego
 def main():
-    '''
-    Setup
-    '''
+
     global selectedPlayers, podium, connected, sock
 
     world = pygame.display.set_mode([worldx, worldy])
@@ -473,12 +580,6 @@ def main():
                     data = sock.recv(1024)    
                     print("1)", data.decode('utf-8'))
                     treesDraw[0] = data.decode('utf-8')
-                    #if ("1:f" in data.decode('utf-8')):
-                    #    event_tree = False
-                    #    print ("Gano el player 1")
-                    #if ("2:f" in data.decode('utf-8')):
-                    #    event_tree = False
-                    #    print ("Gano el player 2")
                 else:
                     player1.challenges += 1
                     if player1.challenges == 3:
@@ -500,12 +601,6 @@ def main():
                     data = sock.recv(1024)    
                     print("2)", data.decode('utf-8'))
                     treesDraw[1] = data.decode('utf-8')
-                    #if ("2:f" in data.decode('utf-8')):
-                    #    event_tree = False
-                    #    print ("Gano el player 2")
-                    #if ("1:f" in data.decode('utf-8')):
-                    #    event_tree = False
-                    #    print ("Gano el player 1")
                 else:
                     player2.challenges += 1
                     if player2.challenges == 3:
@@ -812,7 +907,8 @@ def main():
     #data = sock.recv(1024)
     #sock.close()
     ganador_perdedor(podium)
-    
+
+#Pantalla para elegir un personaje    
 def escoger_jugador():
     #Base de la ventana
     pygame.init()
@@ -1010,6 +1106,9 @@ def escoger_jugador():
 
         pygame.display.update()
 
+        
+#Pantalla de carga
+#Permite observar las instrucciones del juego
 def pantalla_carga():
     pygame.init()
 
@@ -1064,7 +1163,7 @@ def pantalla_carga():
         main()
     
 
-
+#Permite observar los controles de cada jugador
 def ventana_controles():
     pygame.init()
 
