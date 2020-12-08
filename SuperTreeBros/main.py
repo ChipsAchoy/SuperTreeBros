@@ -615,7 +615,7 @@ def main():
             flag6 = True
 
         if event_tree:
-            event_crono = ((pygame.time.get_ticks()) // 1000) - ref_event
+            event_crono = (crono) - ref_event
             if event_crono > 90:   #EVALUAR SI SE ACABA EL EVENTOOOOOOO
                 if player1.nodes >= player2.nodes:
                     player1.challenges += 1

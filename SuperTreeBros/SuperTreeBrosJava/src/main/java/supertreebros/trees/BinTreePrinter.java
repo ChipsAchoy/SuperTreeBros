@@ -93,7 +93,6 @@ class BinTreePrinter {
     private static int maxLevel(Node node) {
         if (node == null)
             return 0;
-
         return Math.max(BinTreePrinter.maxLevel(node.getLeft()), BinTreePrinter.maxLevel(node.getRight())) + 1;
     }
 
