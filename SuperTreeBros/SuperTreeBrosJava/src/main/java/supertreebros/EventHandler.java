@@ -12,7 +12,7 @@ import supertreebros.trees.SplayTree;
 public class EventHandler {
     public String type;
     public int elems;
-    public int level1, level2;
+    public int level1 = 0, level2 = 0;
     public boolean won1 = false, won2 = false;
     private boolean current;
     public BstTree p1BstTree,p2BstTree;
@@ -50,6 +50,8 @@ public class EventHandler {
             instance.type = type;
             instance.won1 = false;
             instance.won2 = false;
+            instance.level1 = 0;
+            instance.level2 = 0;
             instance.defineType();
         }
         return instance;

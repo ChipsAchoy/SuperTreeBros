@@ -583,7 +583,7 @@ def main():
                 else:
                     player1.challenges += 1
                     if player1.challenges == 3:
-                        podium = [player2, player1, "PLAYER2", "PLAYER1"]
+                        podium = [player1, player2, "PLAYER1", "PLAYER2"]
                         main = False
                     print("Player 1 won")
                     event_tree = False
@@ -604,7 +604,7 @@ def main():
                 else:
                     player2.challenges += 1
                     if player2.challenges == 3:
-                        podium = [player1, player2, "PLAYER1", "PLAYER2"]
+                        podium = [player2, player1, "PLAYER2", "PLAYER1"]
                         main = False
                     print("Player 2 won")
                     event_tree = False
@@ -620,7 +620,7 @@ def main():
                 if player1.nodes >= player2.nodes:
                     player1.challenges += 1
                     if player1.challenges == 3:
-                        podium = [player2, player1, "PLAYER2", "PLAYER1"]
+                        podium = [player1, player2, "PLAYER1", "PLAYER2"]
                         main = False
                     print("Player 1 won")
                     event_tree = False
@@ -628,7 +628,7 @@ def main():
                 else:
                     player2.challenges += 1
                     if player2.challenges == 3:
-                        podium = [player1, player2, "PLAYER1", "PLAYER2"]
+                        podium = [player2, player1, "PLAYER2", "PLAYER1"]
                         main = False
                     print("Player 2 won")
                     event_tree = False
