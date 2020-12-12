@@ -411,7 +411,8 @@ def main():
     global selectedPlayers, podium, connected, sock
 
     world = pygame.display.set_mode([worldx, worldy])
-    
+
+    ##Imagenes del juego
     backdrop = pygame.image.load("images/background/bg.png")
     platImage1 = pygame.image.load("images/Platforms/small_platform.png")
     platImage2 = pygame.image.load("images/Platforms/big_platform.png")
@@ -434,7 +435,8 @@ def main():
     token_list = []
     powerup_types = ["forcepush","shield","extrajump"]
     powerup_images = [force_image, shield_image, jump_image]
-    
+
+    ##Flags de manejo de tiempo
     crono = 0
     flag = True
     flag2 = True
@@ -466,7 +468,8 @@ def main():
 
     
     fs = Frames()
-    
+
+    ##Conexion al servidor
     if not connected:
         HOST = "localhost"
         PORT = 12002
@@ -485,7 +488,8 @@ def main():
     ref_crono = (pygame.time.get_ticks()) // 1000
     ref_event = 0
     event_crono = 0
-    
+
+    ##Ciclo de juego
     while main:
 
         crono = ((pygame.time.get_ticks()) // 1000) - ref_crono
@@ -616,7 +620,7 @@ def main():
 
         if event_tree:
             event_crono = (crono) - ref_event
-            if event_crono > 90:   #EVALUAR SI SE ACABA EL EVENTOOOOOOO
+            if event_crono > 90:   
                 if player1.nodes >= player2.nodes:
                     player1.challenges += 1
                     if player1.challenges == 3:
@@ -637,7 +641,7 @@ def main():
                 event_tree = False
                 print("evento finished")
                 
-        
+        ###Manejo de personajes segun los controles
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -708,7 +712,8 @@ def main():
                         if not player.pressed[0] and not player.pressed[1]:
                             player.moving = False
 
-                        
+
+        ##Actualizacion del mundo                
         world.fill((0,0,0))
         world.blit(backdrop, (0,0))
         fs.drawFrames(world)
@@ -872,7 +877,7 @@ def main():
                 font1 = treeFont2
                 
             if len(treesDraw[1]) > 60:
-                font1 = treeFont2
+                font2 = treeFont2
             
             yi = 10
             line = ""
@@ -907,6 +912,7 @@ def main():
     #data = sock.recv(1024)
     #sock.close()
     ganador_perdedor(podium)
+    
 
 #Pantalla para elegir un personaje    
 def escoger_jugador():

@@ -1,7 +1,7 @@
 package supertreebros;
 
 import supertreebros.trees.AvlTree;
-import supertreebros.trees.BTree;
+import supertreebros.trees.Btree;
 import supertreebros.trees.BstTree;
 import supertreebros.trees.SplayTree;
 
@@ -18,7 +18,7 @@ public class EventHandler {
     public BstTree p1BstTree,p2BstTree;
     public AvlTree p1AvlTree,p2AvlTree;
     public SplayTree p1SpTree,p2SpTree;
-    public BTree<Integer, Integer> p1BTree, p2BTree;
+    public Btree p1BTree, p2BTree;
     private static EventHandler instance = null;
     
     /**
@@ -78,9 +78,10 @@ public class EventHandler {
             this.p1SpTree = new SplayTree();
             this.p2SpTree = new SplayTree();
         }else if (this.type.equals("btr")){
-            this.p1BTree = new BTree<Integer, Integer>();
-            this.p2BTree = new BTree<Integer, Integer>();
-        }else{
+            this.p1BTree = new Btree(4);
+            this.p2BTree = new Btree(4);
+        }
+        else{
             System.out.println("No se recibio un arbol correcto");
         }
     }
@@ -103,13 +104,13 @@ public class EventHandler {
             this.p1BstTree = new BstTree();
             this.p1AvlTree = new AvlTree();
             this.p1SpTree = new SplayTree();
-            this.p1BTree = new BTree<Integer, Integer>();
+            this.p1BTree = new Btree(4);
         }else if (added.substring(8, 9).equals("r")&&!this.current){
             this.level2 = 0;
             this.p2BstTree = new BstTree();
             this.p2AvlTree = new AvlTree();
             this.p2SpTree = new SplayTree();
-            this.p2BTree = new BTree<Integer, Integer>();
+            this.p2BTree = new Btree(4);
         }
         else{
             String nodeS = "";
@@ -133,9 +134,9 @@ public class EventHandler {
                     else if(this.type.equals("spl")&&!this.current)
                         this.p2SpTree.append(node);
                     else if (this.type.equals("btr")&&this.current)
-                        this.p1BTree.put(node, node);
+                        this.p1BTree.insert(node);
                     else if(this.type.equals("btr")&&!this.current)
-                        this.p2BTree.put(node, node);
+                        this.p2BTree.insert(node);
                     if (this.current)
                         this.level1++;
                     else
@@ -160,7 +161,7 @@ public class EventHandler {
             else if(this.type.equals("spl"))
                 output1 += this.p1SpTree.getTree();
             else if(this.type.equals("btr"))
-                output1 += this.p1BTree.toString();
+                output1 += this.p1BTree.getTree();
         }
         if (this.current&&this.level1 >= this.elems){
             //output1 = "player1:f";
@@ -177,7 +178,7 @@ public class EventHandler {
             else if(this.type.equals("spl"))
                 output2 += this.p2SpTree.getTree();
             else if(this.type.equals("btr"))
-                output2 += this.p2BTree.toString();
+                output2 += this.p2BTree.getTree();
         }
         if (!this.current&&this.level2 >= this.elems){
             System.out.println("Player 2 won");
